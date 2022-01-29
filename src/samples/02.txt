@@ -1,0 +1,21 @@
+
+      const cameraFront = !(camera.quaternion.y > -0.6 && camera.quaternion.y < 0.8);
+
+      // (top && bottom) ? direction.z + ref.current.position.z : free1 ? direction.z + ref.current.position.z : ref.current.position.z);
+
+      const cameraSide = !(camera.quaternion.y < 0.05 && camera.quaternion.y < 0.9);
+
+      console.log(cameraSide);
+
+
+      ref.current.position.set(
+        !cameraSide ? (right ? direction.x + ref.current.position.x : cameraSide ? direction.x + ref.current.position.x : ref.current.position.x)
+          :
+          (left ? direction.x + ref.current.position.x : ref.current.position.x),
+        0,
+        !cameraFront ? (top ? direction.z + ref.current.position.z : cameraFront ? direction.z + ref.current.position.z : ref.current.position.z)
+          :
+          (bottom ? direction.z + ref.current.position.z : ref.current.position.z));
+
+
+      camera?.position.set(ref.current.position.x, 0.5, ref.current.position.z);

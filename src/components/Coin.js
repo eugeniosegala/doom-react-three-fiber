@@ -14,9 +14,9 @@ const Coin = ({ position }) => {
   const { scene, camera } = useThree();
 
   const coinControl = useCallback(
-    throttle(() => {
+    throttle(async () => {
       if (!hide) {
-        // ref.current.lookAt(camera.position);
+        ref.current.lookAt(camera.position);
         const position = ref?.current?.position;
 
         // this is supposed to be the first object in the scene: tshe player
@@ -24,7 +24,7 @@ const Coin = ({ position }) => {
           calcDistance(scene.children[0].position, position) < 1;
 
         if (collision) {
-          sound.play();
+          await sound.play();
           setHide(true);
         }
       }

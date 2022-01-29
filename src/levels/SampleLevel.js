@@ -4,6 +4,7 @@ import { Stats, OrbitControls } from "@react-three/drei";
 import Plane from "../components/Plane";
 import Player from "../components/Player";
 import Object from "../components/Object";
+import FlatObject from "../components/FlatObject";
 import Coin from "../components/Coin";
 import { mapDataString } from "../utils/mapDataString";
 import { chest, orb } from "../utils/textureManager";
@@ -43,7 +44,7 @@ const resolveMapTile = (type, x, y, mapData, setCurrentMap) => {
       );
     case "T":
       return (
-        <Object
+        <FlatObject
           key={key}
           position={[x, 0.5, y]}
           texture={chest}
@@ -85,7 +86,7 @@ const SampleLevel = () => {
       <Plane position={[0, 0, 0]} colour={colour} />
       <ambientLight intensity={0.1} />
       {memoizedMapData}
-      <Object position={[10, 0.5, 20]} texture={orb} />
+      <FlatObject position={[10, 0.5, 20]} texture={orb} />
       <pointLight
         position={[10, 1.1, 20]}
         intensity={3}
@@ -93,7 +94,7 @@ const SampleLevel = () => {
         penumbra={1}
         color="blue"
       />
-      <Object position={[20, 0.5, 20]} texture={orb} />
+      <FlatObject position={[20, 0.5, 20]} texture={orb} />
       <pointLight
         position={[20, 1.1, 20]}
         intensity={3}

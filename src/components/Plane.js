@@ -1,7 +1,7 @@
-import React, { useRef } from "react";
+import { usePlane } from "@react-three/cannon";
 
 const Plane = (props) => {
-  const ref = useRef();
+  const [ref] = usePlane(() => ({ rotation: [-Math.PI / 2, 0, 0], ...props }));
   return (
     <mesh
       position={props.position}

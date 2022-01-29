@@ -1,15 +1,27 @@
-import React, { useRef } from "react";
+import React from "react";
+import { useSphere } from "@react-three/cannon";
 
-import { bomb } from "../utils/textureManager";
+const Attack = (props) => {
+  const [sphereRef, api] = useSphere(() => ({
+    mass: 5,
+    args: [0.1, 0.1, 0.1],
+    ...props,
+  }));
 
-const Attack = () => {
-  const ref = useRef();
+  setTimeout(() => {
+    api.position.set(-1000, -1000, -1000);
+  }, 2000);
+
   return (
-    <mesh ref={ref} position={[1, 0, 0]}>
-      <boxBufferGeometry attach="geometry" />
-      <meshStandardMaterial attach="material" transparent={true} map={bomb} />
+    <mesh ref={sphereRef}>
+      <sphereBufferGeometry args={[0.1, 32, 32]} />
+      <meshLambertMaterial color="hotpink" />
     </mesh>
   );
 };
 
-export default Attack;
+const isSameType = (prevProps, nextProps) => {
+  return prevProps.position === nextProps.position;
+};
+
+export default React.memo(Attack, isSameType);

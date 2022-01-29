@@ -1,6 +1,10 @@
-import React, { useRef, useCallback } from "react";
+import React, { useCallback, useRef, useState } from "react";
+import { useSphere } from "@react-three/cannon";
 import { useFrame, useThree } from "@react-three/fiber";
 import throttle from "lodash-es/throttle";
+import { Vector3 } from "three";
+
+import { FPVControls } from "./FPVControls";
 
 import {
   playerUpMovement,
@@ -10,121 +14,74 @@ import {
   playerIdleMovement,
 } from "../utils/textureManager";
 import { useKeyboardControls } from "../hooks/useKeyboardControls";
-import { calcDistance, closestObject } from "../utils/calcDistance";
 import Attack from "./Attack";
 
 const Player = () => {
   const { moveForward, moveBackward, moveLeft, moveRight, action } =
     useKeyboardControls();
+  const [bullets, setBullets] = useState([]);
 
-  const { camera, scene } = useThree();
-  const ref = useRef();
+  const [ref, api] = useSphere(() => ({
+    fixedRotation: true,
+    mass: 1,
+    position: [2, 0.5, 2],
+    args: [0.5, 0.5, 0.5],
+  }));
 
-  const positionControl = useCallback(
-    throttle(() => {
-      const position = ref.current.position;
-      const collisions = scene.children.filter((e) => {
-        return calcDistance(e.position, position) <= 2 && e.name === "Blocking";
-      });
+  const player = useRef();
 
-      const topCollisions = collisions.filter((e) => {
-        return (
-          (e.position.x === Math.ceil(position.x) ||
-            e.position.x === Math.floor(position.x)) &&
-          e.position.z <= position.z
-        );
-      });
+  const { camera } = useThree();
 
-      const topClosest =
-        closestObject(
-          topCollisions.map((e) => e.position.z),
-          position.z,
-          -9999
-        ) + 1;
+  useFrame(() => {
+    const obj = ref.current.getWorldPosition(new Vector3());
 
-      const bottomCollisions = collisions.filter((e) => {
-        return (
-          (e.position.x === Math.ceil(position.x) ||
-            e.position.x === Math.floor(position.x)) &&
-          e.position.z >= position.z
-        );
-      });
+    let cameraDirection = new Vector3();
+    camera.getWorldDirection(cameraDirection);
 
-      const bottomClosest =
-        closestObject(
-          bottomCollisions.map((e) => e.position.z),
-          position.z,
-          9999
-        ) - 1;
+    const direction = new Vector3();
+    const frontVector = new Vector3(
+      0,
+      0,
+      (moveBackward ? 1 : 0) - (moveForward ? 1 : 0)
+    );
+    const sideVector = new Vector3(
+      (moveLeft ? 1 : 0) - (moveRight ? 1 : 0),
+      0,
+      0
+    );
 
-      const rightCollisions = collisions.filter((e) => {
-        return (
-          (e.position.z === Math.ceil(position.z) ||
-            e.position.z === Math.floor(position.z)) &&
-          e.position.x >= position.x
-        );
-      });
+    direction
+      .subVectors(frontVector, sideVector)
+      .normalize()
+      .multiplyScalar(6)
+      .applyEuler(camera.rotation);
 
-      const rightClosest =
-        closestObject(
-          rightCollisions.map((e) => e.position.x),
-          position.x,
-          9999
-        ) - 1;
+    api.velocity.set(direction.x, 0, direction.z);
 
-      const leftCollisions = collisions.filter((e) => {
-        return (
-          (e.position.z === Math.ceil(position.z) ||
-            e.position.z === Math.floor(position.z)) &&
-          e.position.x <= position.x
-        );
-      });
+    player.current.position.set(obj.x, 0.5, obj.z);
 
-      const leftClosest =
-        closestObject(
-          leftCollisions.map((e) => e.position.x),
-          position.x,
-          -9999
-        ) + 1;
+    camera?.position.set(obj.x, 0.5, obj.z);
 
-      if (ref.current.position.z > topClosest) {
-        if (moveForward) {
-          ref.current.position.z = Number(
-            (ref.current.position.z - 0.1).toFixed(2)
-          );
-        }
+    const bulletDirection = cameraDirection.clone().multiplyScalar(50);
+    const bulletPosition = camera.position
+      .clone()
+      .add(cameraDirection.clone().multiplyScalar(2));
+
+    if (action) {
+      const now = Date.now();
+      if (now >= (player.current.timeToShoot || 0)) {
+        player.current.timeToShoot = now + 500;
+        setBullets((bullets) => [
+          ...bullets,
+          {
+            id: now,
+            position: [bulletPosition.x, bulletPosition.y, bulletPosition.z],
+            forward: [bulletDirection.x, bulletDirection.y, bulletDirection.z],
+          },
+        ]);
       }
-
-      if (ref.current.position.z < bottomClosest) {
-        if (moveBackward) {
-          ref.current.position.z = Number(
-            (ref.current.position.z + 0.1).toFixed(2)
-          );
-        }
-      }
-
-      if (ref.current.position.x < rightClosest) {
-        if (moveRight) {
-          ref.current.position.x = Number(
-            (ref.current.position.x + 0.1).toFixed(2)
-          );
-        }
-      }
-
-      if (ref.current.position.x > leftClosest) {
-        if (moveLeft) {
-          ref.current.position.x = Number(
-            (ref.current.position.x - 0.1).toFixed(2)
-          );
-        }
-      }
-
-      camera?.position.set(ref.current.position.x, 5, ref.current.position.z);
-    }, 5),
-    [moveForward, moveBackward, moveRight, moveLeft]
-  );
-
-  useFrame(positionControl);
+    }
+  });
 
   const calculateImage = () => {
     if (moveForward) {
@@ -148,15 +105,25 @@ const Player = () => {
 
   return (
     <>
-      <mesh position={[2, 0.5, 2]} ref={ref} name="Player">
+      {bullets.map((bullet) => {
+        return (
+          <Attack
+            key={bullet.id}
+            velocity={bullet.forward}
+            position={bullet.position}
+          />
+        );
+      })}
+      <FPVControls />
+      <mesh ref={player} name="Player">
         <boxBufferGeometry attach="geometry" />
         <meshStandardMaterial
           attach="material"
           transparent={true}
           map={calculateImage()}
         />
-        {action && <Attack />}
       </mesh>
+      <mesh ref={ref} />
     </>
   );
 };
