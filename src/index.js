@@ -6,6 +6,8 @@ import { Physics } from "@react-three/cannon";
 
 import SampleLevel from "./levels/SampleLevel";
 import PhysicalMovements from "./components/PhysicalMovements";
+import UI from "./components/UI";
+import Crosshair from "./components/Crosshair";
 
 import "./index.css";
 
@@ -19,13 +21,17 @@ const Game = () => {
     <>
       {/* <Loader /> */}
       <PhysicalMovements />
+      <UI>
+        <Crosshair />
+      </UI>
       <Canvas camera={{ position: [0, 5, 0], rotation: [0, 0, 0] }}>
         <Physics
           broadphase="SAP"
           defaultContactMaterial={{
             contactEquationRelaxation: 4,
-            friction: 0.05
+            friction: 0.05,
           }}
+          gravity={[0, 0, 0]}
         >
           <SampleLevel />
         </Physics>
