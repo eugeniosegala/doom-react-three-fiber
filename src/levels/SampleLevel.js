@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Stats, OrbitControls } from "@react-three/drei";
 
 import Plane from "../components/Plane";
