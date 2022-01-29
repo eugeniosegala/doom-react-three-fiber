@@ -15,6 +15,10 @@ import {
 import { useKeyboardControls } from "../hooks/useKeyboardControls";
 import Bullet from "./Bullet";
 
+const cameraDirection = new Vector3();
+const playerDirection = new Vector3();
+const currentPosition = new Vector3();
+
 const Player = () => {
   const { moveForward, moveBackward, moveLeft, moveRight, action } =
     useKeyboardControls();
@@ -33,12 +37,10 @@ const Player = () => {
 
   const playerControl = useCallback(
     throttle(async () => {
-      const obj = ref.current.getWorldPosition(new Vector3());
+      const obj = ref.current.getWorldPosition(currentPosition);
 
-      let cameraDirection = new Vector3();
       camera.getWorldDirection(cameraDirection);
 
-      const direction = new Vector3();
       const frontVector = new Vector3(
         0,
         0,
@@ -50,13 +52,13 @@ const Player = () => {
         0
       );
 
-      direction
+      playerDirection
         .subVectors(frontVector, sideVector)
         .normalize()
         .multiplyScalar(6)
         .applyEuler(camera.rotation);
 
-      api.velocity.set(direction.x, 0, direction.z);
+      api.velocity.set(playerDirection.x, 0, playerDirection.z);
 
       player.current.position.set(obj.x, 0.5, obj.z);
 
