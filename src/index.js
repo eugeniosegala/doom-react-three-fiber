@@ -20,11 +20,16 @@ const Game = () => {
         <Crosshair />
         <Gun />
       </UI>
-      <Canvas camera={{ position: [0, 5, 0], rotation: [0, 0, 0] }}>
+      <Canvas
+        mode="concurrent"
+        camera={{ position: [0, 5, 0], rotation: [0, 0, 0] }}
+      >
         <SampleLevel />
       </Canvas>
     </>
   );
 };
 
-ReactDOM.render(<Game />, document.getElementById("root"));
+const container = document.getElementById("root");
+const root = ReactDOM.createRoot(container);
+root.render(<Game />);

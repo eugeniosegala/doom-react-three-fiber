@@ -7,9 +7,9 @@ const Gun = () => {
 
   const sound = new Audio(fireSound);
 
-  useEffect(async () => {
+  useEffect(() => {
     if (action) {
-      await sound.play();
+      sound.play();
     }
   }, [action]);
 
