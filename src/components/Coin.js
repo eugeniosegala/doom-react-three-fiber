@@ -11,6 +11,7 @@ const Coin = ({ position, mapData, setCurrentMap }) => {
 
   const ref = useRef();
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const coinControl = useCallback(
     throttle(async (scene, camera) => {
       ref.current?.lookAt(camera.position);

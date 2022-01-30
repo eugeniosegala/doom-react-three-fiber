@@ -4,13 +4,6 @@ import throttle from "lodash-es/throttle";
 import { Vector3 } from "three";
 
 import { FPVControls } from "./FPVControls";
-import {
-  playerUpMovement,
-  playerDownMovement,
-  playerRightMovement,
-  playerLeftMovement,
-  playerIdleMovement,
-} from "../utils/textureManager";
 import { useKeyboardControls } from "../hooks/useKeyboardControls";
 import Bullet from "./Bullet";
 import { calcDistance, closestObject } from "../utils/calcDistance";
@@ -39,6 +32,7 @@ const Player = () => {
 
   const player = useRef();
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const playerControl = useCallback(
     throttle(async (camera, scene) => {
       const position = player.current.position;
