@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from "react";
-import { useFrame, useThree } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
 import throttle from "lodash-es/throttle";
 import { Vector3 } from "three";
 
@@ -15,9 +15,20 @@ import { useKeyboardControls } from "../hooks/useKeyboardControls";
 import Bullet from "./Bullet";
 import { calcDistance, closestObject } from "../utils/calcDistance";
 
+const limitNumberWithinRangeLR = (num, min, max) => {
+  const MIN = min;
+  const MAX = max;
+  return Math.min(Math.max(num, MIN), MAX);
+};
+
+const limitNumberWithinRangeTB = (num, min, max) => {
+  const MIN = min;
+  const MAX = max;
+  return Math.min(Math.max(num, MIN), MAX);
+};
+
 const cameraDirection = new Vector3();
 const playerDirection = new Vector3();
-const currentPosition = new Vector3();
 
 const Player = () => {
   const { moveForward, moveBackward, moveLeft, moveRight, action } =
@@ -26,10 +37,8 @@ const Player = () => {
 
   const player = useRef();
 
-  const { camera, scene } = useThree();
-
   const playerControl = useCallback(
-    throttle(async () => {
+    throttle(async (camera, scene) => {
       const position = player.current.position;
 
       camera.getWorldDirection(cameraDirection);
@@ -115,24 +124,18 @@ const Player = () => {
           -9999
         ) + 1;
 
-      function limitNumberWithinRange(num, min, max) {
-        const MIN = min || topClosest;
-        const MAX = max || bottomClosest;
-        const parsed = num;
-        return Math.min(Math.max(parsed, MIN), MAX);
-      }
-
-      function limitNumberWithinRange2(num, min, max) {
-        const MIN = min || leftClosest;
-        const MAX = max || rightClosest;
-        const parsed = num;
-        return Math.min(Math.max(parsed, MIN), MAX);
-      }
-
       player.current.position.set(
-        limitNumberWithinRange2(playerDirection.x + position.x),
+        limitNumberWithinRangeLR(
+          playerDirection.x + position.x,
+          leftClosest,
+          rightClosest
+        ),
         0.5,
-        limitNumberWithinRange(playerDirection.z + position.z)
+        limitNumberWithinRangeTB(
+          playerDirection.z + position.z,
+          topClosest,
+          bottomClosest
+        )
       );
 
       camera?.position.set(position.x, 0.5, position.z);
@@ -164,7 +167,7 @@ const Player = () => {
     [moveForward, moveBackward, moveRight, moveLeft, action]
   );
 
-  useFrame(playerControl);
+  useFrame(({ camera, scene }) => playerControl(camera, scene));
 
   const calculateImage = () => {
     if (moveForward) {
@@ -186,17 +189,10 @@ const Player = () => {
     return playerIdleMovement;
   };
 
+  console.log("Player rendering...");
+
   return (
     <>
-      {bullets.map((bullet) => {
-        return (
-          <Bullet
-            key={bullet.id}
-            velocity={bullet.forward}
-            position={bullet.position}
-          />
-        );
-      })}
       <FPVControls />
       <mesh ref={player} position={[2, 0.5, 2]} name="Player">
         <boxBufferGeometry attach="geometry" />
@@ -206,6 +202,15 @@ const Player = () => {
           map={calculateImage()}
         />
       </mesh>
+      {bullets.map((bullet) => {
+        return (
+          <Bullet
+            key={bullet.id}
+            velocity={bullet.forward}
+            position={bullet.position}
+          />
+        );
+      })}
     </>
   );
 };

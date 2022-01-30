@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from "react";
-import { useFrame, useThree } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
 import throttle from "lodash-es/throttle";
 
 import { coin } from "../utils/textureManager";
@@ -11,10 +11,9 @@ const Coin = ({ position }) => {
 
   const ref = useRef();
   const [hide, setHide] = useState(false);
-  const { scene, camera } = useThree();
 
   const coinControl = useCallback(
-    throttle(async () => {
+    throttle(async (scene, camera) => {
       if (!hide) {
         ref.current.lookAt(camera.position);
         const position = ref?.current?.position;
@@ -32,11 +31,13 @@ const Coin = ({ position }) => {
     [hide]
   );
 
-  useFrame(coinControl);
+  useFrame(({ scene, camera }) => coinControl(scene, camera));
 
   if (hide) {
     return null;
   }
+
+  console.log("Coin rendering...");
 
   return (
     <mesh

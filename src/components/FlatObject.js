@@ -1,20 +1,19 @@
 import React, { useCallback, useRef } from "react";
 
 import throttle from "lodash-es/throttle";
-import { useFrame, useThree } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
 
 const FlatObject = ({ texture, position, name }) => {
   const ref = useRef();
-  const { camera } = useThree();
 
   const objectControl = useCallback(
-    throttle(() => {
+    throttle((camera) => {
       ref.current.lookAt(camera.position);
     }, 100),
     []
   );
 
-  useFrame(objectControl);
+  useFrame(({ camera }) => objectControl(camera));
 
   return (
     <mesh ref={ref} position={position} name={name}>

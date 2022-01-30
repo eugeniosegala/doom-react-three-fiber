@@ -1,21 +1,19 @@
 import React, { useRef, useCallback } from "react";
-import { useFrame, useThree } from "@react-three/fiber";
+import { useFrame } from "@react-three/fiber";
 import throttle from "lodash-es/throttle";
 import { calcDistance } from "../utils/calcDistance";
 
 const Bullet = ({ position, velocity }) => {
   const ref = useRef();
 
-  const { scene } = useThree();
-
-  const coinControl = useCallback(
-    throttle(async () => {
+  const bulletControl = useCallback(
+    throttle(async (scene) => {
       const collisions = scene.children.filter((e) => {
         return calcDistance(e.position, ref.current.position) <= 1;
       });
 
       if (collisions.length) {
-        console.log(collisions);
+        // console.log(collisions);
       }
 
       ref.current.position.set(
@@ -27,7 +25,9 @@ const Bullet = ({ position, velocity }) => {
     []
   );
 
-  useFrame(coinControl);
+  useFrame(({ scene }) => bulletControl(scene));
+
+  console.log("Bullet rendering...");
 
   return (
     <mesh ref={ref} position={position}>
@@ -36,8 +36,8 @@ const Bullet = ({ position, velocity }) => {
   );
 };
 
-const isSameType = (prevProps, nextProps) => {
+const isSamePosition = (prevProps, nextProps) => {
   return prevProps.position === nextProps.position;
 };
 
-export default React.memo(Bullet, isSameType);
+export default React.memo(Bullet, isSamePosition);

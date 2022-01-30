@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import { Canvas } from "@react-three/fiber";
-import { useProgress } from "@react-three/drei";
+import { Loader } from "@react-three/drei";
 
 import SampleLevel from "./levels/SampleLevel";
 import PhysicalMovements from "./components/PhysicalMovements";
@@ -11,15 +11,10 @@ import Gun from "./components/Gun";
 
 import "./index.css";
 
-function Loader() {
-  const { progress } = useProgress();
-  return <div>loading {progress.toFixed()} %</div>;
-}
-
 const Game = () => {
   return (
     <>
-      {/* <Loader /> */}
+      <Loader />
       <PhysicalMovements />
       <UI>
         <Crosshair />

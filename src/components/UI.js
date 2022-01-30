@@ -10,7 +10,7 @@ const UI = ({ children }) => {
         width: "100vw",
         height: "100vh",
         display: "flex",
-        "z-index": "100",
+        zIndex: "100",
       }}
     >
       {children}
