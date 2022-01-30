@@ -1,5 +1,4 @@
 import React, { useCallback, useRef, useState } from "react";
-import { useSphere } from "@react-three/cannon";
 import { useFrame, useThree } from "@react-three/fiber";
 import throttle from "lodash-es/throttle";
 import { Vector3 } from "three";
@@ -14,6 +13,7 @@ import {
 } from "../utils/textureManager";
 import { useKeyboardControls } from "../hooks/useKeyboardControls";
 import Bullet from "./Bullet";
+import { calcDistance, closestObject } from "../utils/calcDistance";
 
 const cameraDirection = new Vector3();
 const playerDirection = new Vector3();
@@ -24,20 +24,13 @@ const Player = () => {
     useKeyboardControls();
   const [bullets, setBullets] = useState([]);
 
-  const [ref, api] = useSphere(() => ({
-    fixedRotation: true,
-    mass: 1,
-    position: [2, 0.5, 2],
-    args: [0.5, 0.5, 0.5],
-  }));
-
   const player = useRef();
 
-  const { camera } = useThree();
+  const { camera, scene } = useThree();
 
   const playerControl = useCallback(
     throttle(async () => {
-      const obj = ref.current.getWorldPosition(currentPosition);
+      const position = player.current.position;
 
       camera.getWorldDirection(cameraDirection);
 
@@ -55,19 +48,99 @@ const Player = () => {
       playerDirection
         .subVectors(frontVector, sideVector)
         .normalize()
-        .multiplyScalar(6)
+        .multiplyScalar(0.1)
         .applyEuler(camera.rotation);
 
-      api.velocity.set(playerDirection.x, 0, playerDirection.z);
+      const collisions = scene.children.filter((e) => {
+        return calcDistance(e.position, position) <= 2 && e.name === "Blocking";
+      });
 
-      player.current.position.set(obj.x, 0.5, obj.z);
+      const topCollisions = collisions.filter((e) => {
+        return (
+          (e.position.x === Math.ceil(position.x) ||
+            e.position.x === Math.floor(position.x)) &&
+          e.position.z <= position.z
+        );
+      });
 
-      camera?.position.set(obj.x, 0.5, obj.z);
+      const topClosest =
+        closestObject(
+          topCollisions.map((e) => e.position.z),
+          position.z,
+          -9999
+        ) + 1;
 
-      const bulletDirection = cameraDirection.clone().multiplyScalar(50);
+      const bottomCollisions = collisions.filter((e) => {
+        return (
+          (e.position.x === Math.ceil(position.x) ||
+            e.position.x === Math.floor(position.x)) &&
+          e.position.z >= position.z
+        );
+      });
+
+      const bottomClosest =
+        closestObject(
+          bottomCollisions.map((e) => e.position.z),
+          position.z,
+          9999
+        ) - 1;
+
+      const rightCollisions = collisions.filter((e) => {
+        return (
+          (e.position.z === Math.ceil(position.z) ||
+            e.position.z === Math.floor(position.z)) &&
+          e.position.x >= position.x
+        );
+      });
+
+      const rightClosest =
+        closestObject(
+          rightCollisions.map((e) => e.position.x),
+          position.x,
+          9999
+        ) - 1;
+
+      const leftCollisions = collisions.filter((e) => {
+        return (
+          (e.position.z === Math.ceil(position.z) ||
+            e.position.z === Math.floor(position.z)) &&
+          e.position.x <= position.x
+        );
+      });
+
+      const leftClosest =
+        closestObject(
+          leftCollisions.map((e) => e.position.x),
+          position.x,
+          -9999
+        ) + 1;
+
+      function limitNumberWithinRange(num, min, max) {
+        const MIN = min || topClosest;
+        const MAX = max || bottomClosest;
+        const parsed = num;
+        return Math.min(Math.max(parsed, MIN), MAX);
+      }
+
+      function limitNumberWithinRange2(num, min, max) {
+        const MIN = min || leftClosest;
+        const MAX = max || rightClosest;
+        const parsed = num;
+        return Math.min(Math.max(parsed, MIN), MAX);
+      }
+
+      player.current.position.set(
+        limitNumberWithinRange2(playerDirection.x + position.x),
+        0.5,
+        limitNumberWithinRange(playerDirection.z + position.z)
+      );
+
+      camera?.position.set(position.x, 0.5, position.z);
+
+      const bulletDirection = cameraDirection.clone().multiplyScalar(5);
       const bulletPosition = camera.position
         .clone()
-        .add(cameraDirection.clone().multiplyScalar(2));
+        .add(cameraDirection.clone().multiplyScalar(1));
 
       if (action) {
         const now = Date.now();
@@ -125,7 +198,7 @@ const Player = () => {
         );
       })}
       <FPVControls />
-      <mesh ref={player} name="Player">
+      <mesh ref={player} position={[2, 0.5, 2]} name="Player">
         <boxBufferGeometry attach="geometry" />
         <meshStandardMaterial
           attach="material"
@@ -133,7 +206,6 @@ const Player = () => {
           map={calculateImage()}
         />
       </mesh>
-      <mesh ref={ref} />
     </>
   );
 };

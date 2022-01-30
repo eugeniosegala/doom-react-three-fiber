@@ -1,13 +1,12 @@
-import React from "react";
-import { useBox } from "@react-three/cannon";
+import React, { useRef } from "react";
 
 import { wood } from "../utils/textureManager";
 
 const Object = ({ texture, position, name }) => {
-  const [ref] = useBox(() => ({ mass: 1, position: position, type: "Static" }));
+  const ref = useRef();
 
   return (
-    <mesh ref={ref} name={name}>
+    <mesh ref={ref} position={position} name={name}>
       <boxBufferGeometry attach="geometry" />
       <meshStandardMaterial
         attach="material"
