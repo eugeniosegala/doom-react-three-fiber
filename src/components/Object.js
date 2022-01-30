@@ -1,7 +1,5 @@
 import React, { useRef } from "react";
 
-import { wood } from "../utils/textureManager";
-
 const Object = ({ texture, position, name }) => {
   const ref = useRef();
 
@@ -11,7 +9,7 @@ const Object = ({ texture, position, name }) => {
       <meshStandardMaterial
         attach="material"
         transparent={true}
-        map={texture || wood}
+        map={texture}
       />
     </mesh>
   );

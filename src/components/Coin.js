@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import throttle from "lodash-es/throttle";
 
@@ -6,36 +6,34 @@ import { coin } from "../utils/textureManager";
 import coinSound from "../sounds/coin.wav";
 import { calcDistance } from "../utils/calcDistance";
 
-const Coin = ({ position }) => {
+const Coin = ({ position, mapData, setCurrentMap }) => {
   const sound = new Audio(coinSound);
 
   const ref = useRef();
-  const [hide, setHide] = useState(false);
 
   const coinControl = useCallback(
     throttle(async (scene, camera) => {
-      if (!hide) {
-        ref.current.lookAt(camera.position);
-        const position = ref?.current?.position;
+      ref.current?.lookAt(camera.position);
 
-        // this is supposed to be the first object in the scene: tshe player
-        const collision =
-          calcDistance(scene.children[0].position, position) < 1;
+      // this is supposed to be the first object in the scene: the player
+      const collision =
+        calcDistance(scene.children[0].position, {
+          x: position[0],
+          y: position[1],
+          z: position[2],
+        }) < 1;
 
-        if (collision) {
-          await sound.play();
-          setHide(true);
-        }
+      if (collision) {
+        await sound.play();
+        let newMapData = [...mapData];
+        newMapData[position[2]][position[0]] = "·";
+        setCurrentMap(newMapData);
       }
     }, 100),
-    [hide]
+    []
   );
 
   useFrame(({ scene, camera }) => coinControl(scene, camera));
-
-  if (hide) {
-    return null;
-  }
 
   console.log("Coin rendering...");
 

@@ -29,6 +29,8 @@ const limitNumberWithinRangeTB = (num, min, max) => {
 
 const cameraDirection = new Vector3();
 const playerDirection = new Vector3();
+const frontVector = new Vector3();
+const sideVector = new Vector3();
 
 const Player = () => {
   const { moveForward, moveBackward, moveLeft, moveRight, action } =
@@ -43,16 +45,8 @@ const Player = () => {
 
       camera.getWorldDirection(cameraDirection);
 
-      const frontVector = new Vector3(
-        0,
-        0,
-        (moveBackward ? 1 : 0) - (moveForward ? 1 : 0)
-      );
-      const sideVector = new Vector3(
-        (moveLeft ? 1 : 0) - (moveRight ? 1 : 0),
-        0,
-        0
-      );
+      frontVector.set(0, 0, (moveBackward ? 1 : 0) - (moveForward ? 1 : 0));
+      sideVector.set((moveLeft ? 1 : 0) - (moveRight ? 1 : 0), 0, 0);
 
       playerDirection
         .subVectors(frontVector, sideVector)
@@ -169,39 +163,12 @@ const Player = () => {
 
   useFrame(({ camera, scene }) => playerControl(camera, scene));
 
-  const calculateImage = () => {
-    if (moveForward) {
-      return playerUpMovement;
-    }
-
-    if (moveBackward) {
-      return playerDownMovement;
-    }
-
-    if (moveRight) {
-      return playerRightMovement;
-    }
-
-    if (moveLeft) {
-      return playerLeftMovement;
-    }
-
-    return playerIdleMovement;
-  };
-
   console.log("Player rendering...");
 
   return (
     <>
       <FPVControls />
-      <mesh ref={player} position={[2, 0.5, 2]} name="Player">
-        <boxBufferGeometry attach="geometry" />
-        <meshStandardMaterial
-          attach="material"
-          transparent={true}
-          map={calculateImage()}
-        />
-      </mesh>
+      <mesh ref={player} position={[2, 0.5, 2]} name="Player" />
       {bullets.map((bullet) => {
         return (
           <Bullet

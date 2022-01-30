@@ -6,28 +6,8 @@ import Player from "../components/Player";
 import Object from "../components/Object";
 import FlatObject from "../components/FlatObject";
 import Coin from "../components/Coin";
-import { mapDataString } from "../utils/mapDataString";
-import { chest, orb } from "../utils/textureManager";
-
-const mapData = mapDataString(`
-# # # # # # # # # # # # # # # # #
-# · · · · · · · · · · · · · · · #
-# · · · T · · · · · · · · · · · #
-# · · · · · · · · · · · · · · · #
-# · · · · · · · · · · · · · · · #
-# · · · C · · · C · · · C · · · #
-# · · · · · C · · · C · · · · · #
-# · · · C · · · C · · · C · · · # # # # # # # # # # # # # # # #
-# · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · # 
-# · · · · · · · · · · · · · · · · · · · · · · · · · · · · · · # # # # # # # # #
-# · · · · · · · · · · · · · · · # · · · · · · · · · · · · · · · · · · · · · · #
-# · · · · · · · · · · · · · · · # · · · · · · · · · · · · · · · · · · C C C · #
-# # # # # # # · · · # # # # # # # · · · · · · · · · · · · · · · · · · · · · · #
-· · · · · · · · · · · · · · · · # · · · · · · · · · · · · · · # # # # # # # # #
-· · · · · · · · · · · · · · · · # · · · · · · · · · · · · · · #
-· · · · · · · · · · · · · · · · # · · · · · · · · · · · · · · #
-· · · · · · · · · · · · · · · · # # # # # # # # # # # # # # # #
-`);
+import { chest, orb, wall } from "../utils/textureManager";
+import mapData from "../maps/level01Data";
 
 const resolveMapTile = (type, x, y, mapData, setCurrentMap) => {
   const key = `${x}-${y}`;
@@ -40,6 +20,7 @@ const resolveMapTile = (type, x, y, mapData, setCurrentMap) => {
           position={[x, 0.5, y]}
           type="Static"
           name="Blocking"
+          texture={wall}
         />
       );
     case "T":
@@ -67,8 +48,6 @@ const resolveMapTile = (type, x, y, mapData, setCurrentMap) => {
 };
 
 const SampleLevel = () => {
-  const [colour, setColour] = useState("#7E370C");
-
   const [currentMap, setCurrentMap] = useState(mapData);
 
   // Remove this to see performance degradation
@@ -83,7 +62,7 @@ const SampleLevel = () => {
   return (
     <>
       <Player />
-      <Plane position={[0, 0, 0]} colour={colour} />
+      <Plane position={[0, 0, 0]} colour="#7E370C" />
       <ambientLight intensity={0.1} />
       {memoizedMapData}
       <FlatObject position={[10, 0.5, 20]} texture={orb} />
