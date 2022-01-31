@@ -1,17 +1,16 @@
 import React, { useRef } from "react";
 
-const Object = ({ texture, position, name }) => {
+const Object = ({ position, name, geometry, material }) => {
   const ref = useRef();
 
   return (
-    <mesh ref={ref} position={position} name={name}>
-      <boxBufferGeometry attach="geometry" />
-      <meshStandardMaterial
-        attach="material"
-        transparent={true}
-        map={texture}
-      />
-    </mesh>
+    <mesh
+      ref={ref}
+      position={position}
+      name={name}
+      geometry={geometry}
+      material={material}
+    />
   );
 };
 

@@ -6,8 +6,10 @@ import Player from "../components/Player";
 import Object from "../components/Object";
 import FlatObject from "../components/FlatObject";
 import Coin from "../components/Coin";
-import { chest, orb, wall } from "../utils/textureManager";
+import { chest, orb } from "../utils/textureManager";
+import { geometry, material } from "../shared-geometries/wall";
 import mapData from "../maps-data/level01MapData";
+import Instances from "../components/Instances";
 
 const resolveMapTile = (type, x, y, mapData, setCurrentMap) => {
   const key = `${x}-${y}`;
@@ -20,7 +22,8 @@ const resolveMapTile = (type, x, y, mapData, setCurrentMap) => {
           position={[x, 0.5, y]}
           type="Static"
           name="Blocking"
-          texture={wall}
+          geometry={geometry}
+          material={material}
         />
       );
     case "T":
@@ -96,6 +99,7 @@ const Level01 = () => {
         castShadow={true}
         penumbra={1}
       />
+      <Instances />
       <Stats className="stats" />
     </>
   );
