@@ -9,7 +9,7 @@ import GifLoader from "three-gif-loader";
 
 import wallImg from "../images/wall.jpg";
 import coinImg from "../images/coin.gif";
-import chestImg from "../images/chest.png";
+import barrelImg from "../images/barrel.png";
 import orbImg from "../images/orb.gif";
 
 // instantiate GifLoader
@@ -36,7 +36,7 @@ function imgLoader(path, type) {
 
 const wall = imgLoader(wallImg);
 const coin = imgLoader(coinImg, "gif");
-const chest = imgLoader(chestImg);
+const barrel = imgLoader(barrelImg);
 const orb = imgLoader(orbImg, "gif");
 
-export { wall, coin, chest, orb };
+export { wall, coin, barrel, orb };

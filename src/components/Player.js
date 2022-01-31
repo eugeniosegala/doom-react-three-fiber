@@ -126,7 +126,7 @@ const Player = () => {
         )
       );
 
-      camera?.position.set(position.x, 0.5, position.z);
+      camera?.position.set(position.x, 1, position.z);
 
       const bulletDirection = cameraDirection.clone().multiplyScalar(3);
       const bulletPosition = camera.position

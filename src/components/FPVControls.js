@@ -14,7 +14,7 @@ export const FPVControls = (props) => {
 
   useEffect(() => {
     document.addEventListener("click", () => {
-      // sound.play();
+      sound.play();
       controls.current.lock();
     });
   }, []);

@@ -21,7 +21,7 @@ const Bullet = ({ position, velocity }) => {
         velocity[1] + ref.current.position.y,
         velocity[2] + ref.current.position.z
       );
-    }, 50),
+    }, 25),
     []
   );
 

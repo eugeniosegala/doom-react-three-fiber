@@ -8,8 +8,12 @@ const FlatObject = ({ texture, position, name }) => {
 
   const objectControl = useCallback(
     throttle((camera) => {
-      ref.current.lookAt(camera.position);
-    }, 100),
+      ref.current.lookAt(
+        camera.position.x,
+        camera.position.y - 0.5,
+        camera.position.z
+      );
+    }, 50),
     []
   );
 
