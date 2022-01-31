@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import { Canvas } from "@react-three/fiber";
 import { Loader } from "@react-three/drei";
 
-import SampleLevel from "./levels/SampleLevel";
+import Level01 from "./levels/Level01";
 import PhysicalMovements from "./components/PhysicalMovements";
 import UI from "./components/UI";
 import Crosshair from "./components/Crosshair";
@@ -25,7 +25,7 @@ const Game = () => {
         camera={{ position: [0, 5, 0], rotation: [0, 3.2, 0] }}
       >
         <Suspense fallback={null}>
-          <SampleLevel />
+          <Level01 />
         </Suspense>
       </Canvas>
     </>

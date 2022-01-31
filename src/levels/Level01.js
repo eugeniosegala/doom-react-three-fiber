@@ -7,7 +7,7 @@ import Object from "../components/Object";
 import FlatObject from "../components/FlatObject";
 import Coin from "../components/Coin";
 import { chest, orb, wall } from "../utils/textureManager";
-import mapData from "../maps/level01Data";
+import mapData from "../maps-data/level01MapData";
 
 const resolveMapTile = (type, x, y, mapData, setCurrentMap) => {
   const key = `${x}-${y}`;
@@ -47,7 +47,7 @@ const resolveMapTile = (type, x, y, mapData, setCurrentMap) => {
   }
 };
 
-const SampleLevel = () => {
+const Level01 = () => {
   const [currentMap, setCurrentMap] = useState(mapData);
 
   // Remove this to see performance degradation
@@ -101,4 +101,4 @@ const SampleLevel = () => {
   );
 };
 
-export default SampleLevel;
+export default Level01;
