@@ -48,7 +48,7 @@ const Player = () => {
         .multiplyScalar(0.1)
         .applyEuler(camera.rotation);
 
-      const wallsCollisions = scene.children[1].children.filter((e) => {
+      const wallsCollisions = scene.children[0].children.filter((e) => {
         return calcDistance(e.position, position) <= 2;
       });
 

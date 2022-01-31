@@ -68,8 +68,8 @@ const Level01 = () => {
 
   return (
     <>
-      <Player />
       <Group memoizedWalls={memoizedWalls} />
+      <Player />
       <Plane position={[0, 0, 0]} colour="#7E370C" />
       <ambientLight intensity={0.1} />
       {memoizedMapData}

@@ -18,7 +18,7 @@ const Coin = ({ position, mapData, setCurrentMap }) => {
 
       // this is supposed to be the first object in the scene: the player
       const collision =
-        calcDistance(scene.children[0].position, {
+        calcDistance(scene.children[1].position, {
           x: position[0],
           y: position[1],
           z: position[2],
