@@ -99,7 +99,7 @@ const Level01 = () => {
         castShadow={true}
         penumbra={1}
       />
-      <Instances />
+      {/*<Instances />*/}
       <Stats className="stats" />
     </>
   );

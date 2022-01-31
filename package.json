@@ -1,5 +1,5 @@
 {
-  "name": "doom-xr",
+  "name": "react-three-fiber-fps-template",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
