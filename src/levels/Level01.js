@@ -1,31 +1,18 @@
 import { useState, useMemo } from "react";
-import { Stats } from "@react-three/drei";
+import { Stats, Instance } from "@react-three/drei";
 
 import Plane from "../components/Plane";
 import Player from "../components/Player";
-import Object from "../components/Object";
 import FlatObject from "../components/FlatObject";
 import Coin from "../components/Coin";
 import { chest, orb } from "../utils/textureManager";
-import { geometry, material } from "../shared-geometries/wall";
 import mapData from "../maps-data/level01MapData";
-import Instances from "../components/Instances";
+import Group from "../components/Group";
 
 const resolveMapTile = (type, x, y, mapData, setCurrentMap) => {
   const key = `${x}-${y}`;
 
   switch (type) {
-    case "#":
-      return (
-        <Object
-          key={key}
-          position={[x, 0.5, y]}
-          type="Static"
-          name="Blocking"
-          geometry={geometry}
-          material={material}
-        />
-      );
     case "T":
       return (
         <FlatObject
@@ -50,6 +37,17 @@ const resolveMapTile = (type, x, y, mapData, setCurrentMap) => {
   }
 };
 
+const resolveMapWalls = (type, x, y) => {
+  const key = `${x}-${y}`;
+
+  switch (type) {
+    case "#":
+      return <Instance key={key} position={[x, 0.5, y]} />;
+    default:
+      return null;
+  }
+};
+
 const Level01 = () => {
   const [currentMap, setCurrentMap] = useState(mapData);
 
@@ -60,11 +58,18 @@ const Level01 = () => {
     );
   }, [currentMap]);
 
+  const memoizedWalls = useMemo(() => {
+    return currentMap.map((row, y) =>
+      row.map((type, x) => resolveMapWalls(type, x, y))
+    );
+  }, []);
+
   console.log("World rendering...");
 
   return (
     <>
       <Player />
+      <Group memoizedWalls={memoizedWalls} />
       <Plane position={[0, 0, 0]} colour="#7E370C" />
       <ambientLight intensity={0.1} />
       {memoizedMapData}
@@ -99,7 +104,6 @@ const Level01 = () => {
         castShadow={true}
         penumbra={1}
       />
-      {/*<Instances />*/}
       <Stats className="stats" />
     </>
   );

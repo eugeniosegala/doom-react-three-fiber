@@ -48,11 +48,11 @@ const Player = () => {
         .multiplyScalar(0.1)
         .applyEuler(camera.rotation);
 
-      const collisions = scene.children.filter((e) => {
-        return calcDistance(e.position, position) <= 2 && e.name === "Blocking";
+      const wallsCollisions = scene.children[1].children.filter((e) => {
+        return calcDistance(e.position, position) <= 2;
       });
 
-      const topCollisions = collisions.filter((e) => {
+      const topCollisions = wallsCollisions.filter((e) => {
         return (
           (e.position.x === Math.ceil(position.x) ||
             e.position.x === Math.floor(position.x)) &&
@@ -67,7 +67,7 @@ const Player = () => {
           -9999
         ) + 1;
 
-      const bottomCollisions = collisions.filter((e) => {
+      const bottomCollisions = wallsCollisions.filter((e) => {
         return (
           (e.position.x === Math.ceil(position.x) ||
             e.position.x === Math.floor(position.x)) &&
@@ -82,7 +82,7 @@ const Player = () => {
           9999
         ) - 1;
 
-      const rightCollisions = collisions.filter((e) => {
+      const rightCollisions = wallsCollisions.filter((e) => {
         return (
           (e.position.z === Math.ceil(position.z) ||
             e.position.z === Math.floor(position.z)) &&
@@ -97,7 +97,7 @@ const Player = () => {
           9999
         ) - 1;
 
-      const leftCollisions = collisions.filter((e) => {
+      const leftCollisions = wallsCollisions.filter((e) => {
         return (
           (e.position.z === Math.ceil(position.z) ||
             e.position.z === Math.floor(position.z)) &&

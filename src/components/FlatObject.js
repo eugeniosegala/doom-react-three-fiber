@@ -22,7 +22,6 @@ const FlatObject = ({ texture, position, name }) => {
         attach="material"
         transparent={true}
         map={texture}
-        depthTest={false}
       />
     </mesh>
   );

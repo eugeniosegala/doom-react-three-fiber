@@ -5,7 +5,6 @@ const geometry = new BoxBufferGeometry(1, 1, 1);
 const material = new MeshStandardMaterial({
   attach: "material",
   map: wall,
-  transparent: true,
 });
 
 export { geometry, material };
