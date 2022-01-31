@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import ReactDOM from "react-dom";
 import { Canvas } from "@react-three/fiber";
 import { Loader } from "@react-three/drei";
@@ -24,7 +24,9 @@ const Game = () => {
         mode="concurrent"
         camera={{ position: [0, 5, 0], rotation: [0, 3.2, 0] }}
       >
-        <SampleLevel />
+        <Suspense fallback={null}>
+          <SampleLevel />
+        </Suspense>
       </Canvas>
     </>
   );
