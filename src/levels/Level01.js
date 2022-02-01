@@ -3,6 +3,7 @@ import { Stats, Instance } from "@react-three/drei";
 
 import Plane from "../components/Plane";
 import Player from "../components/Player";
+import Enemy from "../components/Enemy";
 import FlatObject from "../components/FlatObject";
 import Coin from "../components/Coin";
 import { barrel, orb } from "../utils/textureManager";
@@ -76,6 +77,7 @@ const Level01 = () => {
       <Group memoizedWalls={memoizedWalls} />
       <Player />
       {memoizedMapData}
+      <Enemy />
       <Plane
         position={[0, 0, 0]}
         rotation={[-Math.PI / 2, 0, 0]}
