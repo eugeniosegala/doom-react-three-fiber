@@ -1,10 +1,16 @@
-import React, { useRef, useCallback } from "react";
+import React, { useRef, useCallback, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import throttle from "lodash-es/throttle";
 import { calcDistance } from "../utils/calcDistance";
+import fireSound from "../sounds/fire.mp3";
 
 const Bullet = ({ position, velocity }) => {
+  const sound = new Audio(fireSound);
   const ref = useRef();
+
+  useEffect(() => {
+    sound.play();
+  }, []);
 
   const bulletControl = useCallback(
     throttle(async (scene) => {

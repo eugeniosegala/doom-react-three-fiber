@@ -6,8 +6,8 @@ import { geometry, material } from "../shared-geometries/wall";
 const Group = ({ memoizedWalls }) => {
   return (
     <Instances
-      limit={1000}
-      range={1000}
+      limit={10000}
+      range={10000}
       geometry={geometry}
       material={material}
     >
