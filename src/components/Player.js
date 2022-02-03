@@ -3,6 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import throttle from "lodash-es/throttle";
 import { Vector3 } from "three";
 
+import { useAction } from "../store";
 import { FPVControls } from "./FPVControls";
 import { useKeyboardControls } from "../hooks/useKeyboardControls";
 import Bullet from "./Bullet";
@@ -28,7 +29,10 @@ const sideVector = new Vector3();
 const Player = () => {
   const { moveForward, moveBackward, moveLeft, moveRight, action } =
     useKeyboardControls();
+
   const [bullets, setBullets] = useState([]);
+
+  const shoot = useAction((state) => state.shoot);
 
   const player = useRef();
 
@@ -137,8 +141,12 @@ const Player = () => {
         const now = Date.now();
         if (now >= (player.current.timeToShoot || 0)) {
           player.current.timeToShoot = now + 500;
+          shoot(true);
+          setTimeout(() => {
+            shoot(false);
+          }, 150);
           setBullets((bullets) => [
-            ...bullets,
+            // ...bullets,
             {
               id: now,
               position: [bulletPosition.x, bulletPosition.y, bulletPosition.z],

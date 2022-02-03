@@ -1,4 +1,7 @@
 const calcDistance = (p1, p2) => {
+  if (!p1 || !p2) {
+    return null;
+  }
   const a = p2.x - p1.x;
   const b = p2.y - p1.y;
   const c = p2.z - p1.z;

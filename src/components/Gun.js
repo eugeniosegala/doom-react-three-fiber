@@ -1,10 +1,10 @@
 import React from "react";
-import { useKeyboardControls } from "../hooks/useKeyboardControls";
+import { useAction } from "../store";
 
 const Gun = () => {
-  const { action } = useKeyboardControls();
+  const isShooting = useAction((state) => state.isShooting);
 
-  return <div className={action ? "gun-fire" : "gun"} />;
+  return <div className={isShooting ? "gun-fire" : "gun"} />;
 };
 
 export default Gun;

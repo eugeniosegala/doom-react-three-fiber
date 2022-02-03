@@ -14,18 +14,20 @@ const Bullet = ({ position, velocity }) => {
 
   const bulletControl = useCallback(
     throttle(async (scene) => {
+      const position = ref.current?.position;
+
       const collisions = scene.children.filter((e) => {
-        return calcDistance(e.position, ref.current.position) <= 1;
+        return calcDistance(e.position, position) <= 1;
       });
 
       if (collisions.length) {
         // console.log(collisions);
       }
 
-      ref.current.position.set(
-        velocity[0] + ref.current.position.x,
-        velocity[1] + ref.current.position.y,
-        velocity[2] + ref.current.position.z
+      ref?.current?.position.set(
+        velocity[0] + position?.x,
+        velocity[1] + position?.y,
+        velocity[2] + position?.z
       );
     }, 25),
     []
