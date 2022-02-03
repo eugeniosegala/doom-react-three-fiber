@@ -62,7 +62,7 @@ const Enemy = ({ position, type }) => {
           ]);
         }
       }
-    }, 10),
+    }, 50),
     []
   );
 
