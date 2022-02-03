@@ -3,7 +3,6 @@ import { useFrame } from "@react-three/fiber";
 import throttle from "lodash-es/throttle";
 
 import { geometry, materialDog } from "../shared-geometries/wall";
-import FPVControls from "./FPVControls";
 import Bullet from "./Bullet";
 import { Vector3 } from "three";
 import { calcDistance } from "../utils/calcDistance";
@@ -16,7 +15,7 @@ const Enemy = ({ position, type }) => {
   const ref = useRef();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const playerControl = useCallback(
+  const enemyControl = useCallback(
     throttle(async (scene, camera) => {
       const position = ref.current?.position;
 
@@ -67,11 +66,10 @@ const Enemy = ({ position, type }) => {
     []
   );
 
-  useFrame(({ scene, camera }) => playerControl(scene, camera));
+  useFrame(({ scene, camera }) => enemyControl(scene, camera));
 
   return (
     <>
-      <FPVControls />
       <mesh
         ref={ref}
         position={position}
