@@ -3,14 +3,14 @@ import { useFrame } from "@react-three/fiber";
 import throttle from "lodash-es/throttle";
 
 import { geometry, materialDog } from "../shared-geometries/wall";
-import { FPVControls } from "./FPVControls";
+import FPVControls from "./FPVControls";
 import Bullet from "./Bullet";
 import { Vector3 } from "three";
 import { calcDistance } from "../utils/calcDistance";
 
 const direction = new Vector3();
 
-const Enemy = () => {
+const Enemy = ({ position, type }) => {
   const [bullets, setBullets] = useState([]);
 
   const ref = useRef();
@@ -74,7 +74,7 @@ const Enemy = () => {
       <FPVControls />
       <mesh
         ref={ref}
-        position={[10, 0.5, 30]}
+        position={position}
         geometry={geometry}
         material={materialDog}
       />
@@ -91,4 +91,8 @@ const Enemy = () => {
   );
 };
 
-export default Enemy;
+const isSameType = (prevProps, nextProps) => {
+  return prevProps.type === nextProps.type;
+};
+
+export default React.memo(Enemy, isSameType);

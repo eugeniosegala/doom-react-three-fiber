@@ -9,7 +9,7 @@ extend({ PointerLockControlsImpl });
 // this is temporary
 const sound = new Audio(fireSound);
 
-export const FPVControls = (props) => {
+const FPVControls = () => {
   const { camera, gl } = useThree();
   const controls = useRef();
 
@@ -21,10 +21,8 @@ export const FPVControls = (props) => {
   }, []);
 
   return (
-    <pointerLockControlsImpl
-      ref={controls}
-      args={[camera, gl.domElement]}
-      {...props}
-    />
+    <pointerLockControlsImpl ref={controls} args={[camera, gl.domElement]} />
   );
 };
+
+export default React.memo(FPVControls);

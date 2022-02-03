@@ -4,7 +4,7 @@ import throttle from "lodash-es/throttle";
 import { Vector3 } from "three";
 
 import { useAction } from "../store";
-import { FPVControls } from "./FPVControls";
+import FPVControls from "./FPVControls";
 import { useKeyboardControls } from "../hooks/useKeyboardControls";
 import Bullet from "./Bullet";
 import { calcDistance, closestObject } from "../utils/calcDistance";
@@ -184,4 +184,4 @@ const Player = () => {
   );
 };
 
-export default Player;
+export default React.memo(Player);

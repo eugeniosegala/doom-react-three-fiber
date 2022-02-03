@@ -1,6 +1,6 @@
 import React from "react";
 
-const Crosshair = () => {
+const viewFinder = () => {
   return (
     <div
       style={{
@@ -15,4 +15,4 @@ const Crosshair = () => {
   );
 };
 
-export default Crosshair;
+export default viewFinder;

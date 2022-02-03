@@ -33,6 +33,8 @@ const resolveMapTile = (type, x, y, mapData, setCurrentMap) => {
           type={type}
         />
       );
+    case "E":
+      return <Enemy key={key} position={[x, 0.5, y]} type={type} />;
     default:
       return null;
   }
@@ -77,7 +79,6 @@ const Level01 = () => {
       <Group memoizedWalls={memoizedWalls} />
       <Player />
       {memoizedMapData}
-      <Enemy />
       <Plane
         position={[0, 0, 0]}
         rotation={[-Math.PI / 2, 0, 0]}

@@ -1,10 +1,12 @@
-const Plane = (props) => {
+import React from "react";
+
+const Plane = ({ position, rotation, colour }) => {
   return (
-    <mesh position={props.position} rotation={props.rotation} name="plane">
+    <mesh position={position} rotation={rotation} name="plane">
       <planeBufferGeometry attach="geometry" args={[200, 200]} />
-      <meshStandardMaterial attach="material" color={props.colour} />
+      <meshStandardMaterial attach="material" color={colour} />
     </mesh>
   );
 };
 
-export default Plane;
+export default React.memo(Plane);
