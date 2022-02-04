@@ -170,7 +170,7 @@ const Player = () => {
   return (
     <>
       <FPVControls />
-      <mesh ref={player} position={[2, 0.5, 2]} name="Player" />
+      <mesh ref={player} position={[2, 0.5, 2]} name="player" />
       {bullets.map((bullet) => {
         return (
           <Bullet
@@ -178,6 +178,8 @@ const Player = () => {
             velocity={bullet.forward}
             position={bullet.position}
             name="bullet"
+            setBullets={setBullets}
+            collisionMarker={["enemy", "wall"]}
           />
         );
       })}

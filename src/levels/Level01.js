@@ -21,7 +21,7 @@ const resolveMapTile = (type, x, y, mapData, setCurrentMap) => {
           key={key}
           position={[x, 0.5, y]}
           texture={barrel}
-          name="Blocking"
+          name="blocking"
         />
       );
     case "C":
@@ -58,8 +58,8 @@ const resolveMapWalls = (type, x, y) => {
     case "#":
       return (
         <React.Fragment key={key}>
-          <Instance position={[x, 1.5, y]} />
-          <Instance position={[x, 0.5, y]} />
+          <Instance name="wall" position={[x, 1.5, y]} />
+          <Instance name="wall" position={[x, 0.5, y]} />
         </React.Fragment>
       );
     default:

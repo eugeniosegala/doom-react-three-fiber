@@ -4,7 +4,7 @@ import throttle from "lodash-es/throttle";
 import { calcDistance } from "../utils/calcDistance";
 import fireSound from "../sounds/fire.mp3";
 
-const Bullet = ({ position, velocity, name }) => {
+const Bullet = ({ position, velocity, name, setBullets, collisionMarker }) => {
   const sound = new Audio(fireSound);
   const ref = useRef();
 
@@ -16,12 +16,20 @@ const Bullet = ({ position, velocity, name }) => {
     throttle(async (scene) => {
       const position = ref.current?.position;
 
-      const collisions = scene.children.filter((e) => {
-        return calcDistance(e.position, position) <= 1;
+      const collisions = [
+        ...scene.children[0].children,
+        ...scene.children,
+      ].filter((e) => {
+        return (
+          calcDistance(e.position, position) <= 0.9 &&
+          e.name.match(
+            new RegExp("\\b(" + collisionMarker.join("|") + ")\\b", "ig")
+          )
+        );
       });
 
       if (collisions.length) {
-        // console.log(collisions);
+        setBullets([]);
       }
 
       ref?.current?.position.set(

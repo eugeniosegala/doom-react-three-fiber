@@ -87,6 +87,8 @@ const Enemy = ({ position, type, mapData, setCurrentMap }) => {
 
   useFrame(({ scene, camera }) => enemyControl(scene, camera));
 
+  console.log("Enemy rendering...");
+
   return (
     <>
       <mesh
@@ -95,6 +97,7 @@ const Enemy = ({ position, type, mapData, setCurrentMap }) => {
         geometry={dogGeometry}
         material={dogMaterial}
         scale={1.5}
+        name="enemy"
       />
       {bullets.map((bullet) => {
         return (
@@ -102,6 +105,8 @@ const Enemy = ({ position, type, mapData, setCurrentMap }) => {
             key={bullet.id}
             position={bullet.position}
             velocity={bullet.forward}
+            setBullets={setBullets}
+            collisionMarker={["player"]}
           />
         );
       })}
