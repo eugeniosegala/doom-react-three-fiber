@@ -11,7 +11,6 @@ const Group = ({ memoizedWalls }) => {
       geometry={wallGeometry}
       material={wallMaterial}
       castShadow
-      receiveShadow
     >
       {memoizedWalls}
     </Instances>

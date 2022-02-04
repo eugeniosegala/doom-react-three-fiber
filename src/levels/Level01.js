@@ -9,6 +9,7 @@ import Coin from "../components/Coin";
 import { barrel, orb } from "../utils/textureManager";
 import mapData from "../maps-data/level01MapData";
 import Group from "../components/Group";
+import PointLight from "../components/PointLight";
 
 const resolveMapTile = (type, x, y, mapData, setCurrentMap) => {
   const key = `${x}-${y}`;
@@ -34,7 +35,17 @@ const resolveMapTile = (type, x, y, mapData, setCurrentMap) => {
         />
       );
     case "E":
-      return <Enemy key={key} position={[x, 0.5, y]} type={type} />;
+      return (
+        <Enemy
+          key={key}
+          position={[x, 0.75, y]}
+          type={type}
+          mapData={mapData}
+          setCurrentMap={setCurrentMap}
+        />
+      );
+    case "L":
+      return <PointLight key={key} position={[x, 0.5, y]} type={type} />;
     default:
       return null;
   }

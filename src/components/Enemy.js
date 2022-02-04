@@ -3,14 +3,13 @@ import { useFrame } from "@react-three/fiber";
 import throttle from "lodash-es/throttle";
 import { Vector3 } from "three";
 
-import { wallGeometry, wallMaterial } from "../shared-geometries/wall";
 import { dogGeometry, dogMaterial } from "../shared-geometries/dog";
 import Bullet from "./Bullet";
 import { calcDistance } from "../utils/calcDistance";
 
 const direction = new Vector3();
 
-const Enemy = ({ position, type }) => {
+const Enemy = ({ position, type, mapData, setCurrentMap }) => {
   const [bullets, setBullets] = useState([]);
 
   const ref = useRef();
@@ -18,14 +17,26 @@ const Enemy = ({ position, type }) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const enemyControl = useCallback(
     throttle(async (scene, camera) => {
-      const position = ref.current?.position;
+      const dynamicPosition = ref.current?.position;
 
-      const collision =
+      const playerProximity =
         calcDistance(scene.children[1].position, {
-          x: position.x,
-          y: position.y,
-          z: position.z,
+          x: dynamicPosition.x,
+          y: dynamicPosition.y,
+          z: dynamicPosition.z,
         }) < 10;
+
+      const bulletCollisions = scene.children.filter((e) => {
+        return (
+          calcDistance(e.position, dynamicPosition) <= 1 && e.name === "bullet"
+        );
+      });
+
+      if (bulletCollisions.length) {
+        let newMapData = [...mapData];
+        newMapData[position[2]][position[0]] = "·";
+        setCurrentMap(newMapData);
+      }
 
       ref.current.lookAt(
         camera.position.x,
@@ -33,11 +44,14 @@ const Enemy = ({ position, type }) => {
         camera.position.z
       );
 
-      if (collision) {
-        const position = ref.current.position;
+      if (playerProximity) {
         const player = direction
           .subVectors(
-            new Vector3(position.x, position.y, position.z),
+            new Vector3(
+              dynamicPosition.x,
+              dynamicPosition.y,
+              dynamicPosition.z
+            ),
             new Vector3(
               scene.children[1].position.x,
               scene.children[1].position.y,
@@ -50,10 +64,14 @@ const Enemy = ({ position, type }) => {
         const now = Date.now();
         if (now >= (ref.current.timeToShoot || 0)) {
           ref.current.timeToShoot = now + 1000;
-          setBullets((bullets) => [
+          setBullets(() => [
             {
               id: now,
-              position: [position.x, position.y, position.z],
+              position: [
+                dynamicPosition.x,
+                dynamicPosition.y,
+                dynamicPosition.z,
+              ],
               forward: [
                 player.x < 0 ? Math.abs(player.x) : -Math.abs(player.x),
                 player.y < 0 ? Math.abs(player.y) : -Math.abs(player.y),
@@ -63,7 +81,7 @@ const Enemy = ({ position, type }) => {
           ]);
         }
       }
-    }, 50),
+    }, 10),
     []
   );
 
@@ -76,6 +94,7 @@ const Enemy = ({ position, type }) => {
         position={position}
         geometry={dogGeometry}
         material={dogMaterial}
+        scale={1.5}
       />
       {bullets.map((bullet) => {
         return (
