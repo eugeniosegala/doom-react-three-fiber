@@ -1,6 +1,6 @@
 import React from "react";
 
-const viewFinder = () => {
+const ViewFinder = () => {
   return (
     <div
       style={{
@@ -15,4 +15,4 @@ const viewFinder = () => {
   );
 };
 
-export default viewFinder;
+export default ViewFinder;

@@ -6,7 +6,7 @@ import { Loader } from "@react-three/drei";
 import Level01 from "./levels/Level01";
 import PhysicalMovements from "./components/PhysicalMovements";
 import UI from "./components/UI";
-import viewFinder from "./components/viewFinder";
+import ViewFinder from "./components/ViewFinder";
 import Gun from "./components/Gun";
 
 import "./index.css";
@@ -17,7 +17,7 @@ const Game = () => {
       <Loader />
       <PhysicalMovements />
       <UI>
-        <viewFinder />
+        <ViewFinder />
         <Gun />
       </UI>
       <Canvas
