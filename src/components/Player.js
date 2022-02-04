@@ -140,7 +140,7 @@ const Player = () => {
       if (action) {
         const now = Date.now();
         if (now >= (player.current.timeToShoot || 0)) {
-          player.current.timeToShoot = now + 500;
+          player.current.timeToShoot = now + 650;
           shoot(true);
           setTimeout(() => {
             shoot(false);
