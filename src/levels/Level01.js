@@ -99,14 +99,6 @@ const Level01 = () => {
         color="blue"
       />
       <FlatObject position={[20, 0.5, 20]} texture={orb} />
-      <rectAreaLight
-        position={[38.5, 1, 11]}
-        intensity={5}
-        castShadow={true}
-        penumbra={1}
-        width={1}
-        rotation={[0, 20.4, 0]}
-      />
       <spotLight
         position={[10, 10, 10]}
         angle={0.5}

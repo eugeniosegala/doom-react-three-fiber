@@ -1,12 +1,18 @@
 import React from "react";
+import { Plane } from "@react-three/drei";
 
-const Plane = ({ position, rotation, colour }) => {
+const PlaneOb = ({ position, rotation, colour }) => {
   return (
-    <mesh position={position} rotation={rotation} name="plane">
-      <planeBufferGeometry attach="geometry" args={[200, 200]} />
+    <Plane
+      position={position}
+      rotation={rotation}
+      name="plane"
+      receiveShadow
+      args={[200, 200]}
+    >
       <meshStandardMaterial attach="material" color={colour} />
-    </mesh>
+    </Plane>
   );
 };
 
-export default React.memo(Plane);
+export default React.memo(PlaneOb);

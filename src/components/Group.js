@@ -10,6 +10,8 @@ const Group = ({ memoizedWalls }) => {
       range={10000}
       geometry={wallGeometry}
       material={wallMaterial}
+      castShadow
+      receiveShadow
     >
       {memoizedWalls}
     </Instances>
