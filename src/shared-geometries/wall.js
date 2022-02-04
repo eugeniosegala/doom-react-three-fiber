@@ -1,13 +1,10 @@
 import { BoxBufferGeometry, MeshStandardMaterial } from "three";
-import { wall, dog } from "../utils/textureManager";
+import { wall } from "../utils/textureManager";
 
-const geometry = new BoxBufferGeometry(1, 1, 1);
-const material = new MeshStandardMaterial({
+const wallGeometry = new BoxBufferGeometry(1, 1, 1);
+
+const wallMaterial = new MeshStandardMaterial({
   map: wall,
 });
-const materialDog = new MeshStandardMaterial({
-  map: dog,
-  transparent: true,
-});
 
-export { geometry, material, materialDog };
+export { wallGeometry, wallMaterial };

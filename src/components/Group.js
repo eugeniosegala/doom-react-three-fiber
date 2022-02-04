@@ -1,15 +1,15 @@
 import React from "react";
-import { Instances, Instance } from "@react-three/drei";
+import { Instances } from "@react-three/drei";
 
-import { geometry, material } from "../shared-geometries/wall";
+import { wallGeometry, wallMaterial } from "../shared-geometries/wall";
 
 const Group = ({ memoizedWalls }) => {
   return (
     <Instances
       limit={10000}
       range={10000}
-      geometry={geometry}
-      material={material}
+      geometry={wallGeometry}
+      material={wallMaterial}
     >
       {memoizedWalls}
     </Instances>

@@ -1,10 +1,11 @@
 import React, { useCallback, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import throttle from "lodash-es/throttle";
-
-import { geometry, materialDog } from "../shared-geometries/wall";
-import Bullet from "./Bullet";
 import { Vector3 } from "three";
+
+import { wallGeometry, wallMaterial } from "../shared-geometries/wall";
+import { dogGeometry, dogMaterial } from "../shared-geometries/dog";
+import Bullet from "./Bullet";
 import { calcDistance } from "../utils/calcDistance";
 
 const direction = new Vector3();
@@ -73,8 +74,8 @@ const Enemy = ({ position, type }) => {
       <mesh
         ref={ref}
         position={position}
-        geometry={geometry}
-        material={materialDog}
+        geometry={dogGeometry}
+        material={dogMaterial}
       />
       {bullets.map((bullet) => {
         return (
