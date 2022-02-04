@@ -106,7 +106,6 @@ const Level01 = () => {
         position={[10, 1.1, 20]}
         intensity={3}
         castShadow={true}
-        penumbra={1}
         color="blue"
       />
       <FlatObject position={[20, 0.5, 20]} texture={orb} />
@@ -121,7 +120,6 @@ const Level01 = () => {
         position={[20, 1.1, 20]}
         intensity={0.2}
         castShadow={true}
-        penumbra={1}
         color="red"
       />
       <Stats className="stats" />

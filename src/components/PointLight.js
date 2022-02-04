@@ -7,7 +7,7 @@ const PointLight = ({ position, type }) => {
 
   const playerControl = useCallback(
     throttle(() => {
-      const limit = ref.current.position.x < 70;
+      const limit = ref.current.position.x < 73;
 
       ref.current.position.x = limit ? ref.current.position.x + 0.1 : 30;
     }, 10),
@@ -19,10 +19,11 @@ const PointLight = ({ position, type }) => {
   return (
     <pointLight
       ref={ref}
+      distance={20}
+      decay={2}
       position={position}
       intensity={1}
       castShadow={true}
-      penumbra={1}
       color="white"
     />
   );

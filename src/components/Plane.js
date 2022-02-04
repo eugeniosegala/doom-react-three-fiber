@@ -6,9 +6,9 @@ const PlaneOb = ({ position, rotation, colour }) => {
     <Plane
       position={position}
       rotation={rotation}
+      args={[200, 200]}
       name="plane"
       receiveShadow
-      args={[200, 200]}
     >
       <meshStandardMaterial attach="material" color={colour} />
     </Plane>

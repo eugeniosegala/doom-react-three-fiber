@@ -21,7 +21,9 @@ const Game = () => {
         <Gun />
       </UI>
       <Canvas
-        shadows
+        shadows={{
+          type: "BasicShadowMap",
+        }}
         mode="concurrent"
         camera={{ position: [0, 5, 0], rotation: [0, 3.2, 0] }}
       >
