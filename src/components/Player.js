@@ -38,132 +38,157 @@ const Player = () => {
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const playerControl = useCallback(
-    throttle(async (camera, scene) => {
-      const position = player.current.position;
+    throttle(
+      async (
+        camera,
+        scene,
+        moveForward,
+        moveBackward,
+        moveRight,
+        moveLeft,
+        action
+      ) => {
+        const position = player.current.position;
 
-      camera.getWorldDirection(cameraDirection);
+        camera.getWorldDirection(cameraDirection);
 
-      frontVector.set(0, 0, (moveBackward ? 1 : 0) - (moveForward ? 1 : 0));
-      sideVector.set((moveLeft ? 1 : 0) - (moveRight ? 1 : 0), 0, 0);
+        frontVector.set(0, 0, (moveBackward ? 1 : 0) - (moveForward ? 1 : 0));
+        sideVector.set((moveLeft ? 1 : 0) - (moveRight ? 1 : 0), 0, 0);
 
-      playerDirection
-        .subVectors(frontVector, sideVector)
-        .normalize()
-        .multiplyScalar(0.1)
-        .applyEuler(camera.rotation);
+        playerDirection
+          .subVectors(frontVector, sideVector)
+          .normalize()
+          .multiplyScalar(0.1)
+          .applyEuler(camera.rotation);
 
-      const wallsCollisions = scene.children[0].children.filter((e) => {
-        return calcDistance(e.position, position) <= 2;
-      });
+        const wallsCollisions = scene.children[0].children.filter((e) => {
+          return calcDistance(e.position, position) <= 2;
+        });
 
-      const topCollisions = wallsCollisions.filter((e) => {
-        return (
-          (e.position.x === Math.ceil(position.x) ||
-            e.position.x === Math.floor(position.x)) &&
-          e.position.z <= position.z
+        const topCollisions = wallsCollisions.filter((e) => {
+          return (
+            (e.position.x === Math.ceil(position.x) ||
+              e.position.x === Math.floor(position.x)) &&
+            e.position.z <= position.z
+          );
+        });
+
+        const topClosest =
+          closestObject(
+            topCollisions.map((e) => e.position.z),
+            position.z,
+            -9999
+          ) + 1;
+
+        const bottomCollisions = wallsCollisions.filter((e) => {
+          return (
+            (e.position.x === Math.ceil(position.x) ||
+              e.position.x === Math.floor(position.x)) &&
+            e.position.z >= position.z
+          );
+        });
+
+        const bottomClosest =
+          closestObject(
+            bottomCollisions.map((e) => e.position.z),
+            position.z,
+            9999
+          ) - 1;
+
+        const rightCollisions = wallsCollisions.filter((e) => {
+          return (
+            (e.position.z === Math.ceil(position.z) ||
+              e.position.z === Math.floor(position.z)) &&
+            e.position.x >= position.x
+          );
+        });
+
+        const rightClosest =
+          closestObject(
+            rightCollisions.map((e) => e.position.x),
+            position.x,
+            9999
+          ) - 1;
+
+        const leftCollisions = wallsCollisions.filter((e) => {
+          return (
+            (e.position.z === Math.ceil(position.z) ||
+              e.position.z === Math.floor(position.z)) &&
+            e.position.x <= position.x
+          );
+        });
+
+        const leftClosest =
+          closestObject(
+            leftCollisions.map((e) => e.position.x),
+            position.x,
+            -9999
+          ) + 1;
+
+        player.current.position.set(
+          limitNumberWithinRangeLR(
+            playerDirection.x + position.x,
+            leftClosest,
+            rightClosest
+          ),
+          0.5,
+          limitNumberWithinRangeTB(
+            playerDirection.z + position.z,
+            topClosest,
+            bottomClosest
+          )
         );
-      });
 
-      const topClosest =
-        closestObject(
-          topCollisions.map((e) => e.position.z),
-          position.z,
-          -9999
-        ) + 1;
+        camera?.position.set(position.x, 1, position.z);
 
-      const bottomCollisions = wallsCollisions.filter((e) => {
-        return (
-          (e.position.x === Math.ceil(position.x) ||
-            e.position.x === Math.floor(position.x)) &&
-          e.position.z >= position.z
-        );
-      });
+        const bulletDirection = cameraDirection.clone().multiplyScalar(1);
+        const bulletPosition = camera.position
+          .clone()
+          .add(cameraDirection.clone().multiplyScalar(1));
 
-      const bottomClosest =
-        closestObject(
-          bottomCollisions.map((e) => e.position.z),
-          position.z,
-          9999
-        ) - 1;
-
-      const rightCollisions = wallsCollisions.filter((e) => {
-        return (
-          (e.position.z === Math.ceil(position.z) ||
-            e.position.z === Math.floor(position.z)) &&
-          e.position.x >= position.x
-        );
-      });
-
-      const rightClosest =
-        closestObject(
-          rightCollisions.map((e) => e.position.x),
-          position.x,
-          9999
-        ) - 1;
-
-      const leftCollisions = wallsCollisions.filter((e) => {
-        return (
-          (e.position.z === Math.ceil(position.z) ||
-            e.position.z === Math.floor(position.z)) &&
-          e.position.x <= position.x
-        );
-      });
-
-      const leftClosest =
-        closestObject(
-          leftCollisions.map((e) => e.position.x),
-          position.x,
-          -9999
-        ) + 1;
-
-      player.current.position.set(
-        limitNumberWithinRangeLR(
-          playerDirection.x + position.x,
-          leftClosest,
-          rightClosest
-        ),
-        0.5,
-        limitNumberWithinRangeTB(
-          playerDirection.z + position.z,
-          topClosest,
-          bottomClosest
-        )
-      );
-
-      camera?.position.set(position.x, 1, position.z);
-
-      const bulletDirection = cameraDirection.clone().multiplyScalar(1);
-      const bulletPosition = camera.position
-        .clone()
-        .add(cameraDirection.clone().multiplyScalar(1));
-
-      if (action) {
-        const now = Date.now();
-        if (now >= (player.current.timeToShoot || 0)) {
-          player.current.timeToShoot = now + 650;
-          shoot(true);
-          setTimeout(() => {
-            shoot(false);
-          }, 150);
-          setBullets((bullets) => [
-            // ...bullets,
-            {
-              id: now,
-              position: [bulletPosition.x, bulletPosition.y, bulletPosition.z],
-              forward: [
-                bulletDirection.x,
-                bulletDirection.y,
-                bulletDirection.z,
-              ],
-            },
-          ]);
+        if (action) {
+          const now = Date.now();
+          if (now >= (player.current.timeToShoot || 0)) {
+            player.current.timeToShoot = now + 650;
+            shoot(true);
+            setTimeout(() => {
+              shoot(false);
+            }, 150);
+            setBullets((bullets) => [
+              // ...bullets,
+              {
+                id: now,
+                position: [
+                  bulletPosition.x,
+                  bulletPosition.y,
+                  bulletPosition.z,
+                ],
+                forward: [
+                  bulletDirection.x,
+                  bulletDirection.y,
+                  bulletDirection.z,
+                ],
+              },
+            ]);
+          }
         }
-      }
-    }, 5),
-    [moveForward, moveBackward, moveRight, moveLeft, action]
+      },
+      5
+    ),
+    []
   );
 
-  useFrame(({ camera, scene }) => playerControl(camera, scene));
+  useFrame(({ camera, scene }) =>
+    playerControl(
+      camera,
+      scene,
+      moveForward,
+      moveBackward,
+      moveRight,
+      moveLeft,
+      action
+    )
+  );
 
   console.log("Player rendering...");
 

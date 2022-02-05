@@ -9,7 +9,7 @@ import { calcDistance } from "../utils/calcDistance";
 
 const direction = new Vector3();
 
-const Enemy = ({ position, type, mapData, setCurrentMap }) => {
+const Enemy = ({ position, mapData, setCurrentMap }) => {
   const [bullets, setBullets] = useState([]);
 
   const ref = useRef();
