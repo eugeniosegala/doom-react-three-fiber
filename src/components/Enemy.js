@@ -28,8 +28,7 @@ const Enemy = ({ position, type, mapData, setCurrentMap }) => {
 
       const bulletCollisions = scene.children.filter((e) => {
         return (
-          calcDistance(e.position, dynamicPosition) <= 0.9 &&
-          e.name === "bullet"
+          calcDistance(e.position, dynamicPosition) <= 1 && e.name === "bullet"
         );
       });
 
@@ -82,7 +81,7 @@ const Enemy = ({ position, type, mapData, setCurrentMap }) => {
           ]);
         }
       }
-    }, 10),
+    }, 5),
     []
   );
 

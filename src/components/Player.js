@@ -132,7 +132,7 @@ const Player = () => {
 
       camera?.position.set(position.x, 1, position.z);
 
-      const bulletDirection = cameraDirection.clone().multiplyScalar(1);
+      const bulletDirection = cameraDirection.clone().multiplyScalar(2);
       const bulletPosition = camera.position
         .clone()
         .add(cameraDirection.clone().multiplyScalar(1));
@@ -159,7 +159,7 @@ const Player = () => {
           ]);
         }
       }
-    }, 10),
+    }, 5),
     [moveForward, moveBackward, moveRight, moveLeft, action]
   );
 

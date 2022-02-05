@@ -1,20 +1,32 @@
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useRef, useState, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import throttle from "lodash-es/throttle";
 
 const PointLight = ({ position, type }) => {
   const ref = useRef();
 
-  const playerControl = useCallback(
-    throttle(() => {
-      const limit = ref.current.position.x < 73;
+  const [direction, setDirection] = useState(false);
 
-      ref.current.position.x = limit ? ref.current.position.x + 0.1 : 30;
-    }, 10),
+  const playerControl = useCallback(
+    throttle((direction) => {
+      ref.current.position.x = direction
+        ? ref.current.position.x - 0.1
+        : ref.current.position.x + 0.1;
+    }, 5),
     []
   );
 
-  useFrame(playerControl);
+  useFrame(() => playerControl(direction));
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setDirection((direction) => !direction);
+    }, 6000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  console.log("Light rendering...");
 
   return (
     <pointLight
