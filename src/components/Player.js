@@ -9,6 +9,8 @@ import { useKeyboardControls } from "../hooks/useKeyboardControls";
 import Bullet from "./Bullet";
 import { calcDistance, closestObject } from "../utils/calcDistance";
 
+// TODO: Consider to use Web Workers
+
 const PLAYER_SPEED = 0.075;
 const PLAYER_BULLET_SPEED = 1;
 const WORLD_COLLISION_MARGIN = 1.45;
