@@ -14,14 +14,29 @@ const possibleEnemyWDirection = ["up", "down", "right", "left"];
 const Enemy = ({ position, mapData, setCurrentMap }) => {
   const [bullets, setBullets] = useState([]);
 
-  const [enemyWDirection, setEnemyWDirection] = useState("");
+  let currTime = 0;
+  let prevTime = 0;
 
   const ref = useRef();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const enemyControl = useCallback(
-    throttle(async (scene, camera, enemyWDirection) => {
+    throttle(async (scene, camera, clock) => {
       const dynamicPosition = ref.current?.position;
+
+      ////////////////////////////
+      ///// Timers
+      ////////////////////////////
+
+      currTime = clock.getElapsedTime();
+
+      if (currTime - prevTime > 5) {
+        ref.current.enemyWDirection =
+          possibleEnemyWDirection[
+            Math.floor(Math.random() * possibleEnemyWDirection.length)
+          ];
+        prevTime = clock.getElapsedTime();
+      }
 
       ////////////////////////////
       ///// Camera manager
@@ -170,25 +185,25 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
 
       if (!ref.current.isChaising) {
         if (dynamicPosition.z > topClosest) {
-          if (enemyWDirection === "up") {
+          if (ref.current.enemyWDirection === "up") {
             dynamicPosition.z = Number((dynamicPosition.z - 0.025).toFixed(2));
           }
         }
 
         if (dynamicPosition.z < bottomClosest) {
-          if (enemyWDirection === "down") {
+          if (ref.current.enemyWDirection === "down") {
             dynamicPosition.z = Number((dynamicPosition.z + 0.025).toFixed(2));
           }
         }
 
         if (dynamicPosition.x < rightClosest) {
-          if (enemyWDirection === "right") {
+          if (ref.current.enemyWDirection === "right") {
             dynamicPosition.x = Number((dynamicPosition.x + 0.025).toFixed(2));
           }
         }
 
         if (dynamicPosition.x > leftClosest) {
-          if (enemyWDirection === "left") {
+          if (ref.current.enemyWDirection === "left") {
             dynamicPosition.x = Number((dynamicPosition.x - 0.025).toFixed(2));
           }
         }
@@ -197,30 +212,13 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
     []
   );
 
-  useFrame(({ scene, camera }) => enemyControl(scene, camera, enemyWDirection));
+  useFrame(({ scene, camera, clock }) => enemyControl(scene, camera, clock));
 
   useEffect(() => {
-    ////////////////////////////
-    ///// Randomly selecting enemy direction every X seconds
-    ////////////////////////////
-
-    setEnemyWDirection(
-      () =>
-        possibleEnemyWDirection[
-          Math.floor(Math.random() * possibleEnemyWDirection.length)
-        ]
-    );
-
-    const timer = setInterval(() => {
-      setEnemyWDirection(
-        () =>
-          possibleEnemyWDirection[
-            Math.floor(Math.random() * possibleEnemyWDirection.length)
-          ]
-      );
-    }, 5000);
-
-    return () => clearInterval(timer);
+    ref.current.enemyWDirection =
+      possibleEnemyWDirection[
+        Math.floor(Math.random() * possibleEnemyWDirection.length)
+      ];
   }, []);
 
   console.log("Enemy rendering...");
