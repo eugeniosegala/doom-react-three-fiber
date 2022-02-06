@@ -7,7 +7,7 @@ import { dogGeometry, dogMaterial } from "../shared-geometries/dog";
 import Bullet from "./Bullet";
 import { calcDistance, closestObject } from "../utils/calcDistance";
 
-const ENEMY_SPEED = 0.1;
+const ENEMY_SPEED = 0.025;
 
 const direction = new Vector3();
 
@@ -177,33 +177,25 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
 
       if (dynamicPosition.z > topClosest) {
         if (ref.current.enemyWDirection === "up") {
-          dynamicPosition.z = Number(
-            (dynamicPosition.z - ENEMY_SPEED).toFixed(2)
-          );
+          dynamicPosition.z = (dynamicPosition.z * 10 - ENEMY_SPEED * 10) / 10;
         }
       }
 
       if (dynamicPosition.z < bottomClosest) {
         if (ref.current.enemyWDirection === "down") {
-          dynamicPosition.z = Number(
-            (dynamicPosition.z + ENEMY_SPEED).toFixed(2)
-          );
+          dynamicPosition.z = (dynamicPosition.z * 10 + ENEMY_SPEED * 10) / 10;
         }
       }
 
       if (dynamicPosition.x < rightClosest) {
         if (ref.current.enemyWDirection === "right") {
-          dynamicPosition.x = Number(
-            (dynamicPosition.x + ENEMY_SPEED).toFixed(2)
-          );
+          dynamicPosition.x = (dynamicPosition.x * 10 + ENEMY_SPEED * 10) / 10;
         }
       }
 
       if (dynamicPosition.x > leftClosest) {
         if (ref.current.enemyWDirection === "left") {
-          dynamicPosition.x = Number(
-            (dynamicPosition.x - ENEMY_SPEED).toFixed(2)
-          );
+          dynamicPosition.x = (dynamicPosition.x * 10 - ENEMY_SPEED * 10) / 10;
         }
       }
 
@@ -213,7 +205,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
 
       currTime = clock.getElapsedTime();
 
-      if (currTime - prevTime > 1) {
+      if (currTime - prevTime > 3) {
         // deciding next movement based on current position
         if (leftCollisions.length) {
           ref.current.enemyWDirection = ["up", "down", "right", "right"][
@@ -237,8 +229,6 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
               Math.floor(Math.random() * possibleEnemyWDirection.length)
             ];
         }
-
-        console.log(ref.current.enemyWDirection);
 
         prevTime = clock.getElapsedTime();
       }
