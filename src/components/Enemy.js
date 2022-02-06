@@ -7,6 +7,8 @@ import { dogGeometry, dogMaterial } from "../shared-geometries/dog";
 import Bullet from "./Bullet";
 import { calcDistance, closestObject } from "../utils/calcDistance";
 
+const ENEMY_SPEED = 0.1;
+
 const direction = new Vector3();
 
 const possibleEnemyWDirection = ["up", "down", "right", "left"];
@@ -23,20 +25,6 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
   const enemyControl = useCallback(
     throttle(async (scene, camera, clock) => {
       const dynamicPosition = ref.current?.position;
-
-      ////////////////////////////
-      ///// Timers
-      ////////////////////////////
-
-      currTime = clock.getElapsedTime();
-
-      if (currTime - prevTime > 5) {
-        ref.current.enemyWDirection =
-          possibleEnemyWDirection[
-            Math.floor(Math.random() * possibleEnemyWDirection.length)
-          ];
-        prevTime = clock.getElapsedTime();
-      }
 
       ////////////////////////////
       ///// Camera manager
@@ -116,7 +104,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
       }
 
       ////////////////////////////
-      ///// Enemy movements
+      ///// Enemy collision
       ////////////////////////////
 
       const wallsCollisions = scene.children[0].children.filter((e) => {
@@ -183,30 +171,76 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
           -9999
         ) + 1;
 
-      if (!ref.current.isChaising) {
-        if (dynamicPosition.z > topClosest) {
-          if (ref.current.enemyWDirection === "up") {
-            dynamicPosition.z = Number((dynamicPosition.z - 0.025).toFixed(2));
-          }
+      ////////////////////////////
+      ///// Enemy movements
+      ////////////////////////////
+
+      if (dynamicPosition.z > topClosest) {
+        if (ref.current.enemyWDirection === "up") {
+          dynamicPosition.z = Number(
+            (dynamicPosition.z - ENEMY_SPEED).toFixed(2)
+          );
+        }
+      }
+
+      if (dynamicPosition.z < bottomClosest) {
+        if (ref.current.enemyWDirection === "down") {
+          dynamicPosition.z = Number(
+            (dynamicPosition.z + ENEMY_SPEED).toFixed(2)
+          );
+        }
+      }
+
+      if (dynamicPosition.x < rightClosest) {
+        if (ref.current.enemyWDirection === "right") {
+          dynamicPosition.x = Number(
+            (dynamicPosition.x + ENEMY_SPEED).toFixed(2)
+          );
+        }
+      }
+
+      if (dynamicPosition.x > leftClosest) {
+        if (ref.current.enemyWDirection === "left") {
+          dynamicPosition.x = Number(
+            (dynamicPosition.x - ENEMY_SPEED).toFixed(2)
+          );
+        }
+      }
+
+      ////////////////////////////
+      ///// Timers
+      ////////////////////////////
+
+      currTime = clock.getElapsedTime();
+
+      if (currTime - prevTime > 1) {
+        // deciding next movement based on current position
+        if (leftCollisions.length) {
+          ref.current.enemyWDirection = ["up", "down", "right", "right"][
+            Math.floor(Math.random() * possibleEnemyWDirection.length)
+          ];
+        } else if (rightCollisions.length) {
+          ref.current.enemyWDirection = ["up", "down", "left", "left"][
+            Math.floor(Math.random() * possibleEnemyWDirection.length)
+          ];
+        } else if (topCollisions.length) {
+          ref.current.enemyWDirection = ["left", "down", "down", "right"][
+            Math.floor(Math.random() * possibleEnemyWDirection.length)
+          ];
+        } else if (bottomCollisions.length) {
+          ref.current.enemyWDirection = ["up", "up", "left", "right"][
+            Math.floor(Math.random() * possibleEnemyWDirection.length)
+          ];
+        } else {
+          ref.current.enemyWDirection =
+            possibleEnemyWDirection[
+              Math.floor(Math.random() * possibleEnemyWDirection.length)
+            ];
         }
 
-        if (dynamicPosition.z < bottomClosest) {
-          if (ref.current.enemyWDirection === "down") {
-            dynamicPosition.z = Number((dynamicPosition.z + 0.025).toFixed(2));
-          }
-        }
+        console.log(ref.current.enemyWDirection);
 
-        if (dynamicPosition.x < rightClosest) {
-          if (ref.current.enemyWDirection === "right") {
-            dynamicPosition.x = Number((dynamicPosition.x + 0.025).toFixed(2));
-          }
-        }
-
-        if (dynamicPosition.x > leftClosest) {
-          if (ref.current.enemyWDirection === "left") {
-            dynamicPosition.x = Number((dynamicPosition.x - 0.025).toFixed(2));
-          }
-        }
+        prevTime = clock.getElapsedTime();
       }
     }, 10),
     []
@@ -215,6 +249,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
   useFrame(({ scene, camera, clock }) => enemyControl(scene, camera, clock));
 
   useEffect(() => {
+    // the first movement is random
     ref.current.enemyWDirection =
       possibleEnemyWDirection[
         Math.floor(Math.random() * possibleEnemyWDirection.length)

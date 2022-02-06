@@ -11,7 +11,7 @@ import { calcDistance, closestObject } from "../utils/calcDistance";
 
 // TODO: Consider to use Web Workers
 
-const PLAYER_SPEED = 0.075;
+const PLAYER_SPEED = 0.08;
 const PLAYER_BULLET_SPEED = 1;
 const WORLD_COLLISION_MARGIN = 1.45;
 const TOP_LEFT_BOUNDARY = -9999;
