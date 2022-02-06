@@ -50,16 +50,9 @@ const Player = () => {
       ) => {
         const position = player.current.position;
 
-        camera.getWorldDirection(cameraDirection);
-
-        frontVector.set(0, 0, (moveBackward ? 1 : 0) - (moveForward ? 1 : 0));
-        sideVector.set((moveLeft ? 1 : 0) - (moveRight ? 1 : 0), 0, 0);
-
-        playerDirection
-          .subVectors(frontVector, sideVector)
-          .normalize()
-          .multiplyScalar(0.1)
-          .applyEuler(camera.rotation);
+        ////////////////////////////
+        ///// Wall collisions manager
+        ////////////////////////////
 
         const wallsCollisions = scene.children[0].children.filter((e) => {
           return calcDistance(e.position, position) <= 2;
@@ -139,7 +132,37 @@ const Player = () => {
           )
         );
 
+        ////////////////////////////
+        ///// Camera & player direction manager
+        ////////////////////////////
+
+        camera.getWorldDirection(cameraDirection);
+
+        frontVector.set(0, 0, (moveBackward ? 1 : 0) - (moveForward ? 1 : 0));
+        sideVector.set((moveLeft ? 1 : 0) - (moveRight ? 1 : 0), 0, 0);
+
+        playerDirection
+          .subVectors(frontVector, sideVector)
+          .normalize()
+          // change this number if you want the player to move faster
+          .multiplyScalar(0.1)
+          .applyEuler(camera.rotation);
+
         camera?.position.set(position.x, 1, position.z);
+
+        // collision fixer angle top left
+        if (
+          wallsCollisions.length &&
+          camera.quaternion.y >= 0.3 &&
+          camera.quaternion.y <= 0.4 &&
+          (moveForward || moveLeft)
+        ) {
+          position.x = position.x + 0.05;
+        }
+
+        ////////////////////////////
+        ///// Bullets manager
+        ////////////////////////////
 
         const bulletDirection = cameraDirection.clone().multiplyScalar(1);
         const bulletPosition = camera.position
@@ -173,7 +196,7 @@ const Player = () => {
           }
         }
       },
-      5
+      2
     ),
     []
   );
