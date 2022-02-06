@@ -61,7 +61,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
           x: dynamicPosition.x,
           y: dynamicPosition.y,
           z: dynamicPosition.z,
-        }) < 10;
+        }) < 20;
 
       if (playerProximity) {
         ref.current.isChaising = true;

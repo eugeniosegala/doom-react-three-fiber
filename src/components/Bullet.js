@@ -21,7 +21,7 @@ const Bullet = ({ position, velocity, name, setBullets, collisionMarker }) => {
         ...scene.children,
       ].filter((e) => {
         return (
-          calcDistance(e.position, position) <= 1 &&
+          calcDistance(e.position, position) <= 0.8 &&
           e.name.match(
             new RegExp("\\b(" + collisionMarker.join("|") + ")\\b", "ig")
           )
@@ -30,13 +30,13 @@ const Bullet = ({ position, velocity, name, setBullets, collisionMarker }) => {
 
       if (collisions.length) {
         setBullets([]);
+      } else {
+        ref?.current?.position.set(
+          velocity[0] + position?.x,
+          velocity[1] + position?.y,
+          velocity[2] + position?.z
+        );
       }
-
-      ref?.current?.position.set(
-        velocity[0] + position?.x,
-        velocity[1] + position?.y,
-        velocity[2] + position?.z
-      );
     }, 10),
     []
   );
