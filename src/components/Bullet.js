@@ -21,7 +21,7 @@ const Bullet = ({ position, velocity, name, setBullets, collisionMarker }) => {
         ...scene.children,
       ].filter((e) => {
         return (
-          calcDistance(e.position, position) <= 0.8 &&
+          calcDistance(e.position, position) <= 0.85 &&
           e.name.match(
             new RegExp("\\b(" + collisionMarker.join("|") + ")\\b", "ig")
           )
