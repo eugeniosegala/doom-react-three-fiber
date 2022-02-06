@@ -9,13 +9,13 @@ import { useKeyboardControls } from "../hooks/useKeyboardControls";
 import Bullet from "./Bullet";
 import { calcDistance, closestObject } from "../utils/calcDistance";
 
-const limitNumberWithinRangeLR = (num, min, max) => {
-  const MIN = min;
-  const MAX = max;
-  return Math.min(Math.max(num, MIN), MAX);
-};
+const PLAYER_SPEED = 0.075;
+const PLAYER_BULLET_SPEED = 1;
+const WORLD_COLLISION_MARGIN = 1.45;
+const TOP_LEFT_BOUNDARY = -9999;
+const BOTTOM_RIGHT_BOUNDARY = 9999;
 
-const limitNumberWithinRangeTB = (num, min, max) => {
+const limitNumberWithinRange = (num, min, max) => {
   const MIN = min;
   const MAX = max;
   return Math.min(Math.max(num, MIN), MAX);
@@ -48,6 +48,7 @@ const Player = () => {
         moveLeft,
         action
       ) => {
+        // player position
         const position = player.current.position;
 
         ////////////////////////////
@@ -55,7 +56,7 @@ const Player = () => {
         ////////////////////////////
 
         const wallsCollisions = scene.children[0].children.filter((e) => {
-          return calcDistance(e.position, position) <= 2;
+          return calcDistance(e.position, position) <= WORLD_COLLISION_MARGIN;
         });
 
         const topCollisions = wallsCollisions.filter((e) => {
@@ -70,7 +71,7 @@ const Player = () => {
           closestObject(
             topCollisions.map((e) => e.position.z),
             position.z,
-            -9999
+            TOP_LEFT_BOUNDARY
           ) + 1;
 
         const bottomCollisions = wallsCollisions.filter((e) => {
@@ -85,7 +86,7 @@ const Player = () => {
           closestObject(
             bottomCollisions.map((e) => e.position.z),
             position.z,
-            9999
+            BOTTOM_RIGHT_BOUNDARY
           ) - 1;
 
         const rightCollisions = wallsCollisions.filter((e) => {
@@ -100,7 +101,7 @@ const Player = () => {
           closestObject(
             rightCollisions.map((e) => e.position.x),
             position.x,
-            9999
+            BOTTOM_RIGHT_BOUNDARY
           ) - 1;
 
         const leftCollisions = wallsCollisions.filter((e) => {
@@ -115,25 +116,59 @@ const Player = () => {
           closestObject(
             leftCollisions.map((e) => e.position.x),
             position.x,
-            -9999
+            TOP_LEFT_BOUNDARY
           ) + 1;
 
-        player.current.position.set(
-          limitNumberWithinRangeLR(
-            playerDirection.x + position.x,
-            leftClosest,
-            rightClosest
-          ),
-          0.5,
-          limitNumberWithinRangeTB(
-            playerDirection.z + position.z,
-            topClosest,
-            bottomClosest
-          )
+        // DIAGONAL FIXES LEFT
+        const topLeftCollisions = wallsCollisions.filter((e) => {
+          return (
+            e.position.x === Math.round(position.x) - 1 &&
+            e.position.z === Math.round(position.z) - 1 &&
+            topClosest === TOP_LEFT_BOUNDARY + 1
+          );
+        });
+
+        const angleTopLeftLimit = Number(topLeftCollisions[0]?.position.x + 1);
+
+        const bottomLeftCollisions = wallsCollisions.filter((e) => {
+          return (
+            e.position.x === Math.round(position.x) - 1 &&
+            e.position.z === Math.round(position.z) + 1 &&
+            bottomClosest === BOTTOM_RIGHT_BOUNDARY - 1
+          );
+        });
+
+        const angleBottomLeftLimit = Number(
+          bottomLeftCollisions[0]?.position.x + 1
+        );
+
+        // DIAGONAL FIXES RIGHT
+        const topRightCollisions = wallsCollisions.filter((e) => {
+          return (
+            e.position.x === Math.round(position.x) + 1 &&
+            e.position.z === Math.round(position.z) - 1 &&
+            topClosest === TOP_LEFT_BOUNDARY + 1
+          );
+        });
+
+        const angleTopRightLimit = Number(
+          topRightCollisions[0]?.position.x - 1
+        );
+
+        const bottomRightCollisions = wallsCollisions.filter((e) => {
+          return (
+            e.position.x === Math.round(position.x) + 1 &&
+            e.position.z === Math.round(position.z) + 1 &&
+            bottomClosest === BOTTOM_RIGHT_BOUNDARY - 1
+          );
+        });
+
+        const angleBottomRightLimit = Number(
+          bottomRightCollisions[0]?.position.x - 1
         );
 
         ////////////////////////////
-        ///// Camera & player direction manager
+        ///// Camera & direction manager
         ////////////////////////////
 
         camera.getWorldDirection(cameraDirection);
@@ -144,30 +179,41 @@ const Player = () => {
         playerDirection
           .subVectors(frontVector, sideVector)
           .normalize()
-          // change this number if you want the player to move faster
-          .multiplyScalar(0.1)
+          .multiplyScalar(PLAYER_SPEED)
           .applyEuler(camera.rotation);
 
         camera?.position.set(position.x, 1, position.z);
 
-        // collision fixer angle top left
-        if (
-          wallsCollisions.length &&
-          camera.quaternion.y >= 0.3 &&
-          camera.quaternion.y <= 0.4 &&
-          (moveForward || moveLeft)
-        ) {
-          position.x = position.x + 0.05;
-        }
+        ////////////////////////////
+        ///// Player object position manager
+        ////////////////////////////
+
+        player.current.position.set(
+          limitNumberWithinRange(
+            playerDirection.x + position.x,
+            angleTopLeftLimit || angleBottomLeftLimit || leftClosest,
+            angleTopRightLimit || angleBottomRightLimit || rightClosest
+          ),
+          0.5,
+          limitNumberWithinRange(
+            playerDirection.z + position.z,
+            topClosest,
+            bottomClosest
+          )
+        );
 
         ////////////////////////////
         ///// Bullets manager
         ////////////////////////////
 
-        const bulletDirection = cameraDirection.clone().multiplyScalar(1);
         const bulletPosition = camera.position
           .clone()
           .add(cameraDirection.clone().multiplyScalar(1));
+
+        // Bullet speed
+        const bulletDirection = cameraDirection
+          .clone()
+          .multiplyScalar(PLAYER_BULLET_SPEED);
 
         if (action) {
           const now = Date.now();
@@ -196,7 +242,7 @@ const Player = () => {
           }
         }
       },
-      2
+      10
     ),
     []
   );

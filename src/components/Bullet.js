@@ -37,7 +37,7 @@ const Bullet = ({ position, velocity, name, setBullets, collisionMarker }) => {
         velocity[1] + position?.y,
         velocity[2] + position?.z
       );
-    }, 2),
+    }, 10),
     []
   );
 

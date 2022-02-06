@@ -193,7 +193,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
           }
         }
       }
-    }, 2),
+    }, 10),
     []
   );
 
