@@ -61,7 +61,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
           x: dynamicPosition.x,
           y: dynamicPosition.y,
           z: dynamicPosition.z,
-        }) < 20;
+        }) < 15;
 
       if (playerProximity) {
         ref.current.isChaising = true;
@@ -80,7 +80,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
             )
           )
           .clone()
-          .multiplyScalar(0.1);
+          .multiplyScalar(0.05);
 
         const now = Date.now();
         if (now >= (ref.current.timeToShoot || 0)) {
@@ -107,7 +107,14 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
       ///// Enemy collision
       ////////////////////////////
 
-      const wallsCollisions = scene.children[0].children.filter((e) => {
+      const wallsCollisions = [
+        ...scene.children[0].children,
+        ...scene.children.filter(
+          (obj) =>
+            obj.name.includes("enemy") &&
+            obj.name !== `enemy-${position[0]}-${position[2]}`
+        ),
+      ].filter((e) => {
         return calcDistance(e.position, dynamicPosition) <= 2;
       });
 
@@ -208,19 +215,27 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
       if (currTime - prevTime > 3) {
         // deciding next movement based on current position
         if (leftCollisions.length) {
-          ref.current.enemyWDirection = ["up", "down", "right", "right"][
-            Math.floor(Math.random() * possibleEnemyWDirection.length)
-          ];
+          ref.current.enemyWDirection = [
+            "up",
+            "down",
+            "right",
+            "right",
+            "right",
+          ][Math.floor(Math.random() * possibleEnemyWDirection.length)];
         } else if (rightCollisions.length) {
-          ref.current.enemyWDirection = ["up", "down", "left", "left"][
+          ref.current.enemyWDirection = ["up", "down", "left", "left", "left"][
             Math.floor(Math.random() * possibleEnemyWDirection.length)
           ];
         } else if (topCollisions.length) {
-          ref.current.enemyWDirection = ["left", "down", "down", "right"][
-            Math.floor(Math.random() * possibleEnemyWDirection.length)
-          ];
+          ref.current.enemyWDirection = [
+            "left",
+            "right",
+            "down",
+            "down",
+            "down",
+          ][Math.floor(Math.random() * possibleEnemyWDirection.length)];
         } else if (bottomCollisions.length) {
-          ref.current.enemyWDirection = ["up", "up", "left", "right"][
+          ref.current.enemyWDirection = ["left", "right", "up", "up", "up"][
             Math.floor(Math.random() * possibleEnemyWDirection.length)
           ];
         } else {
@@ -256,7 +271,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
         geometry={dogGeometry}
         material={dogMaterial}
         scale={1.5}
-        name="enemy"
+        name={`enemy-${position[0]}-${position[2]}`}
       />
       {bullets.map((bullet) => {
         return (
