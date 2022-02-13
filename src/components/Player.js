@@ -22,6 +22,7 @@ const frontVector = new Vector3();
 const sideVector = new Vector3();
 
 // TODO: Consider to use Web Workers
+// TODO: Split logic into smaller files
 
 const Player = () => {
   const { moveForward, moveBackward, moveLeft, moveRight, action } =

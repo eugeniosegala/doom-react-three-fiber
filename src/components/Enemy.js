@@ -23,6 +23,7 @@ const possibleEnemyWDirection = ["up", "down", "right", "left"];
 const direction = new Vector3();
 
 // TODO: Consider to use Web Workers
+// TODO: Split logic into smaller files
 
 const Enemy = ({ position, mapData, setCurrentMap }) => {
   const [bullets, setBullets] = useState([]);
