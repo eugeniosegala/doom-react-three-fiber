@@ -8,8 +8,7 @@ import FPVControls from "./FPVControls";
 import { useKeyboardControls } from "../hooks/useKeyboardControls";
 import Bullet from "./Bullet";
 import { calcDistance, closestObject } from "../utils/calcDistance";
-
-// TODO: Consider to use Web Workers
+import limitNumberWithinRange from "../utils/limitNumberWithinRange";
 
 const PLAYER_SPEED = 0.08;
 const PLAYER_BULLET_SPEED = 1;
@@ -17,16 +16,12 @@ const WORLD_COLLISION_MARGIN = 1.45;
 const TOP_LEFT_BOUNDARY = -9999;
 const BOTTOM_RIGHT_BOUNDARY = 9999;
 
-const limitNumberWithinRange = (num, min, max) => {
-  const MIN = min;
-  const MAX = max;
-  return Math.min(Math.max(num, MIN), MAX);
-};
-
 const cameraDirection = new Vector3();
 const playerDirection = new Vector3();
 const frontVector = new Vector3();
 const sideVector = new Vector3();
+
+// TODO: Consider to use Web Workers
 
 const Player = () => {
   const { moveForward, moveBackward, moveLeft, moveRight, action } =

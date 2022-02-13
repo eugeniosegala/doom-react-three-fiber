@@ -6,43 +6,16 @@ import { Vector3 } from "three";
 import { dogGeometry, dogMaterial } from "../shared-geometries/dog";
 import Bullet from "./Bullet";
 import { calcDistance, closestObject } from "../utils/calcDistance";
-
-// Bresenham's line algorithm: https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
-const calcLine = (x0, y0, x1, y1) => {
-  const dx = Math.abs(x1 - x0);
-  const dy = Math.abs(y1 - y0);
-  const sx = x0 < x1 ? 1 : -1;
-  const sy = y0 < y1 ? 1 : -1;
-  let err = dx - dy;
-
-  const points = [];
-
-  while (true) {
-    points.push({
-      x: x0,
-      z: y0,
-    });
-
-    if (x0 === x1 && y0 === y1) break;
-    const e2 = 2 * err;
-    if (e2 > -dy) {
-      err -= dy;
-      x0 += sx;
-    }
-    if (e2 < dx) {
-      err += dx;
-      y0 += sy;
-    }
-  }
-
-  return points;
-};
+import limitNumberWithinRange from "../utils/limitNumberWithinRange";
+import calcLine from "../utils/calcLine";
 
 const ENEMY_SPEED = 0.025;
 
 const direction = new Vector3();
 
 const possibleEnemyWDirection = ["up", "down", "right", "left"];
+
+// TODO: Consider to use Web Workers
 
 const Enemy = ({ position, mapData, setCurrentMap }) => {
   const [bullets, setBullets] = useState([]);
@@ -109,18 +82,19 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
           z: enemyPosition.z,
         }) < 15;
 
+      const playerDirection = direction.subVectors(
+        new Vector3(enemyPosition.x, enemyPosition.y, enemyPosition.z),
+        new Vector3(
+          scene.children[1].position.x,
+          scene.children[1].position.y,
+          scene.children[1].position.z
+        )
+      );
+
       if (playerProximity && !objectsBetweenEandP) {
         ref.current.isChaising = true;
 
-        const playerDirection = direction
-          .subVectors(
-            new Vector3(enemyPosition.x, enemyPosition.y, enemyPosition.z),
-            new Vector3(
-              scene.children[1].position.x,
-              scene.children[1].position.y,
-              scene.children[1].position.z
-            )
-          )
+        const playerDirectionBullet = playerDirection
           .clone()
           .multiplyScalar(0.05);
 
@@ -132,15 +106,15 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
               id: now,
               position: [enemyPosition.x, enemyPosition.y, enemyPosition.z],
               forward: [
-                playerDirection.x < 0
-                  ? Math.abs(playerDirection.x)
-                  : -Math.abs(playerDirection.x),
-                playerDirection.y < 0
-                  ? Math.abs(playerDirection.y)
-                  : -Math.abs(playerDirection.y),
-                playerDirection.z < 0
-                  ? Math.abs(playerDirection.z)
-                  : -Math.abs(playerDirection.z),
+                playerDirectionBullet.x < 0
+                  ? Math.abs(playerDirectionBullet.x)
+                  : -Math.abs(playerDirectionBullet.x),
+                playerDirectionBullet.y < 0
+                  ? Math.abs(playerDirectionBullet.y)
+                  : -Math.abs(playerDirectionBullet.y),
+                playerDirectionBullet.z < 0
+                  ? Math.abs(playerDirectionBullet.z)
+                  : -Math.abs(playerDirectionBullet.z),
               ],
             },
           ]);
@@ -226,6 +200,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
       ///// Enemy movements
       ////////////////////////////
 
+      // Random movements
       if (!ref.current.isChaising) {
         if (enemyPosition.z > topClosest) {
           if (ref.current.enemyWDirection === "up") {
@@ -250,6 +225,31 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
             enemyPosition.x = (enemyPosition.x * 10 - ENEMY_SPEED * 10) / 10;
           }
         }
+      }
+
+      // Chase mode
+      if (ref.current.isChaising) {
+        const playerDirectionChase = playerDirection
+          .clone()
+          .multiplyScalar(0.0075);
+
+        ref?.current?.position.set(
+          limitNumberWithinRange(
+            (playerDirectionChase.x < 0
+              ? Math.abs(playerDirectionChase.x)
+              : -Math.abs(playerDirectionChase.x)) + enemyPosition?.x,
+            leftClosest,
+            rightClosest
+          ),
+          0.75,
+          limitNumberWithinRange(
+            (playerDirectionChase.z < 0
+              ? Math.abs(playerDirectionChase.z)
+              : -Math.abs(playerDirectionChase.z)) + enemyPosition?.z,
+            topClosest,
+            bottomClosest
+          )
+        );
       }
 
       ////////////////////////////
