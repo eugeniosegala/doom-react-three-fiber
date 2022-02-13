@@ -75,7 +75,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
         )
       );
 
-      const playerProximity =
+      const playerProximityAggro =
         calcDistance(playerPosition, {
           x: enemyPosition.x,
           y: enemyPosition.y,
@@ -91,7 +91,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
         )
       );
 
-      if (playerProximity && !objectsBetweenEandP) {
+      if (playerProximityAggro && !objectsBetweenEandP) {
         ref.current.isChaising = true;
 
         const playerDirectionBullet = playerDirection
@@ -229,27 +229,36 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
 
       // Chase mode
       if (ref.current.isChaising) {
+        const playerProximityChase =
+          calcDistance(playerPosition, {
+            x: enemyPosition.x,
+            y: enemyPosition.y,
+            z: enemyPosition.z,
+          }) < 2;
+
         const playerDirectionChase = playerDirection
           .clone()
           .multiplyScalar(0.0075);
 
-        ref?.current?.position.set(
-          limitNumberWithinRange(
-            (playerDirectionChase.x < 0
-              ? Math.abs(playerDirectionChase.x)
-              : -Math.abs(playerDirectionChase.x)) + enemyPosition?.x,
-            leftClosest,
-            rightClosest
-          ),
-          0.75,
-          limitNumberWithinRange(
-            (playerDirectionChase.z < 0
-              ? Math.abs(playerDirectionChase.z)
-              : -Math.abs(playerDirectionChase.z)) + enemyPosition?.z,
-            topClosest,
-            bottomClosest
-          )
-        );
+        if (!playerProximityChase) {
+          ref?.current?.position.set(
+            limitNumberWithinRange(
+              (playerDirectionChase.x < 0
+                ? Math.abs(playerDirectionChase.x)
+                : -Math.abs(playerDirectionChase.x)) + enemyPosition?.x,
+              leftClosest,
+              rightClosest
+            ),
+            0.75,
+            limitNumberWithinRange(
+              (playerDirectionChase.z < 0
+                ? Math.abs(playerDirectionChase.z)
+                : -Math.abs(playerDirectionChase.z)) + enemyPosition?.z,
+              topClosest,
+              bottomClosest
+            )
+          );
+        }
       }
 
       ////////////////////////////
