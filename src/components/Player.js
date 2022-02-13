@@ -10,7 +10,7 @@ import Bullet from "./Bullet";
 import { calcDistance, closestObject } from "../utils/calcDistance";
 import limitNumberWithinRange from "../utils/limitNumberWithinRange";
 
-const PLAYER_SPEED = 0.08;
+const PLAYER_SPEED = 0.09;
 const PLAYER_BULLET_SPEED = 1;
 const WORLD_COLLISION_MARGIN = 1.45;
 const TOP_LEFT_BOUNDARY = -9999;

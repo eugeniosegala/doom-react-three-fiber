@@ -138,8 +138,8 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
 
       const topCollisions = wallsCollisions.filter((e) => {
         return (
-          (e.position.x === Math.ceil(enemyPosition.x) ||
-            e.position.x === Math.floor(enemyPosition.x)) &&
+          (Math.ceil(e.position.x) === Math.ceil(enemyPosition.x) ||
+            Math.floor(e.position.x) === Math.floor(enemyPosition.x)) &&
           e.position.z <= enemyPosition.z
         );
       });
@@ -153,8 +153,8 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
 
       const bottomCollisions = wallsCollisions.filter((e) => {
         return (
-          (e.position.x === Math.ceil(enemyPosition.x) ||
-            e.position.x === Math.floor(enemyPosition.x)) &&
+          (Math.ceil(e.position.x) === Math.ceil(enemyPosition.x) ||
+            Math.floor(e.position.x) === Math.floor(enemyPosition.x)) &&
           e.position.z >= enemyPosition.z
         );
       });
@@ -168,8 +168,8 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
 
       const rightCollisions = wallsCollisions.filter((e) => {
         return (
-          (e.position.z === Math.ceil(enemyPosition.z) ||
-            e.position.z === Math.floor(enemyPosition.z)) &&
+          (Math.ceil(e.position.z) === Math.ceil(enemyPosition.z) ||
+            Math.floor(e.position.z) === Math.floor(enemyPosition.z)) &&
           e.position.x >= enemyPosition.x
         );
       });
@@ -183,8 +183,8 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
 
       const leftCollisions = wallsCollisions.filter((e) => {
         return (
-          (e.position.z === Math.ceil(enemyPosition.z) ||
-            e.position.z === Math.floor(enemyPosition.z)) &&
+          (Math.ceil(e.position.z) === Math.ceil(enemyPosition.z) ||
+            Math.floor(e.position.z) === Math.floor(enemyPosition.z)) &&
           e.position.x <= enemyPosition.x
         );
       });
