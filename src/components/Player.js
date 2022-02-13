@@ -50,7 +50,7 @@ const Player = () => {
         const position = player.current.position;
 
         ////////////////////////////
-        ///// Wall collisions manager
+        ///// Player collisions
         ////////////////////////////
 
         const wallsCollisions = scene.children[0].children.filter((e) => {

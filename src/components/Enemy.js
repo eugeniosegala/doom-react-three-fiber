@@ -17,6 +17,7 @@ const ENEMY_AGGRO_AREA = 15;
 const WORLD_COLLISION_MARGIN = 2;
 const TOP_LEFT_BOUNDARY = -9999;
 const BOTTOM_RIGHT_BOUNDARY = 9999;
+const SHOULD_MOVE = true;
 
 const possibleEnemyWDirection = ["up", "down", "right", "left"];
 
@@ -130,7 +131,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
       }
 
       ////////////////////////////
-      ///// Enemy collision
+      ///// Enemy collisions
       ////////////////////////////
 
       const wallsCollisions = [
@@ -210,107 +211,110 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
       ///// Enemy movements
       ////////////////////////////
 
-      // Random movements
-      if (!ref.current.isChaising) {
-        if (enemyPosition.z > topClosest) {
-          if (ref.current.enemyWDirection === "up") {
-            enemyPosition.z = (enemyPosition.z * 10 - ENEMY_SPEED * 10) / 10;
+      if (SHOULD_MOVE) {
+        // Chase mode
+        if (ref.current.isChaising) {
+          const playerProximityChase =
+            calcDistance(playerPosition, {
+              x: enemyPosition.x,
+              y: enemyPosition.y,
+              z: enemyPosition.z,
+            }) < 2;
+
+          const playerDirectionChase = playerDirection
+            .clone()
+            .multiplyScalar(ENEMY_CHASE_SPEED);
+
+          if (!playerProximityChase) {
+            ref?.current?.position.set(
+              limitNumberWithinRange(
+                (playerDirectionChase.x < 0
+                  ? Math.abs(playerDirectionChase.x)
+                  : -Math.abs(playerDirectionChase.x)) + enemyPosition?.x,
+                leftClosest,
+                rightClosest
+              ),
+              0.75,
+              limitNumberWithinRange(
+                (playerDirectionChase.z < 0
+                  ? Math.abs(playerDirectionChase.z)
+                  : -Math.abs(playerDirectionChase.z)) + enemyPosition?.z,
+                topClosest,
+                bottomClosest
+              )
+            );
           }
         }
 
-        if (enemyPosition.z < bottomClosest) {
-          if (ref.current.enemyWDirection === "down") {
-            enemyPosition.z = (enemyPosition.z * 10 + ENEMY_SPEED * 10) / 10;
+        // Pre-script movements
+        if (!ref.current.isChaising) {
+          if (enemyPosition.z > topClosest) {
+            if (ref.current.enemyWDirection === "up") {
+              enemyPosition.z = (enemyPosition.z * 10 - ENEMY_SPEED * 10) / 10;
+            }
+          }
+
+          if (enemyPosition.z < bottomClosest) {
+            if (ref.current.enemyWDirection === "down") {
+              enemyPosition.z = (enemyPosition.z * 10 + ENEMY_SPEED * 10) / 10;
+            }
+          }
+
+          if (enemyPosition.x < rightClosest) {
+            if (ref.current.enemyWDirection === "right") {
+              enemyPosition.x = (enemyPosition.x * 10 + ENEMY_SPEED * 10) / 10;
+            }
+          }
+
+          if (enemyPosition.x > leftClosest) {
+            if (ref.current.enemyWDirection === "left") {
+              enemyPosition.x = (enemyPosition.x * 10 - ENEMY_SPEED * 10) / 10;
+            }
+          }
+
+          // Random movements based of timers
+          currTime = clock.getElapsedTime();
+
+          if (currTime - prevTime > 3) {
+            // deciding next random movement based on current position
+            if (leftCollisions.length) {
+              ref.current.enemyWDirection = [
+                "up",
+                "down",
+                "right",
+                "right",
+                "right",
+              ][Math.floor(Math.random() * possibleEnemyWDirection.length)];
+            } else if (rightCollisions.length) {
+              ref.current.enemyWDirection = [
+                "up",
+                "down",
+                "left",
+                "left",
+                "left",
+              ][Math.floor(Math.random() * possibleEnemyWDirection.length)];
+            } else if (topCollisions.length) {
+              ref.current.enemyWDirection = [
+                "left",
+                "right",
+                "down",
+                "down",
+                "down",
+              ][Math.floor(Math.random() * possibleEnemyWDirection.length)];
+            } else if (bottomCollisions.length) {
+              ref.current.enemyWDirection = ["left", "right", "up", "up", "up"][
+                Math.floor(Math.random() * possibleEnemyWDirection.length)
+              ];
+            } else {
+              ref.current.enemyWDirection =
+                possibleEnemyWDirection[
+                  Math.floor(Math.random() * possibleEnemyWDirection.length)
+                ];
+            }
+
+            prevTime = clock.getElapsedTime();
           }
         }
-
-        if (enemyPosition.x < rightClosest) {
-          if (ref.current.enemyWDirection === "right") {
-            enemyPosition.x = (enemyPosition.x * 10 + ENEMY_SPEED * 10) / 10;
-          }
-        }
-
-        if (enemyPosition.x > leftClosest) {
-          if (ref.current.enemyWDirection === "left") {
-            enemyPosition.x = (enemyPosition.x * 10 - ENEMY_SPEED * 10) / 10;
-          }
-        }
-      }
-
-      // Chase mode
-      if (ref.current.isChaising) {
-        const playerProximityChase =
-          calcDistance(playerPosition, {
-            x: enemyPosition.x,
-            y: enemyPosition.y,
-            z: enemyPosition.z,
-          }) < 2;
-
-        const playerDirectionChase = playerDirection
-          .clone()
-          .multiplyScalar(ENEMY_CHASE_SPEED);
-
-        if (!playerProximityChase) {
-          ref?.current?.position.set(
-            limitNumberWithinRange(
-              (playerDirectionChase.x < 0
-                ? Math.abs(playerDirectionChase.x)
-                : -Math.abs(playerDirectionChase.x)) + enemyPosition?.x,
-              leftClosest,
-              rightClosest
-            ),
-            0.75,
-            limitNumberWithinRange(
-              (playerDirectionChase.z < 0
-                ? Math.abs(playerDirectionChase.z)
-                : -Math.abs(playerDirectionChase.z)) + enemyPosition?.z,
-              topClosest,
-              bottomClosest
-            )
-          );
-        }
-      }
-
-      ////////////////////////////
-      ///// Timers
-      ////////////////////////////
-
-      currTime = clock.getElapsedTime();
-
-      if (currTime - prevTime > 3) {
-        // deciding next random movement based on current position
-        if (leftCollisions.length) {
-          ref.current.enemyWDirection = [
-            "up",
-            "down",
-            "right",
-            "right",
-            "right",
-          ][Math.floor(Math.random() * possibleEnemyWDirection.length)];
-        } else if (rightCollisions.length) {
-          ref.current.enemyWDirection = ["up", "down", "left", "left", "left"][
-            Math.floor(Math.random() * possibleEnemyWDirection.length)
-          ];
-        } else if (topCollisions.length) {
-          ref.current.enemyWDirection = [
-            "left",
-            "right",
-            "down",
-            "down",
-            "down",
-          ][Math.floor(Math.random() * possibleEnemyWDirection.length)];
-        } else if (bottomCollisions.length) {
-          ref.current.enemyWDirection = ["left", "right", "up", "up", "up"][
-            Math.floor(Math.random() * possibleEnemyWDirection.length)
-          ];
-        } else {
-          ref.current.enemyWDirection =
-            possibleEnemyWDirection[
-              Math.floor(Math.random() * possibleEnemyWDirection.length)
-            ];
-        }
-
-        prevTime = clock.getElapsedTime();
       }
     }, 10),
     []
@@ -319,11 +323,13 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
   useFrame(({ scene, camera, clock }) => enemyControl(scene, camera, clock));
 
   useEffect(() => {
-    // the first movement is random
-    ref.current.enemyWDirection =
-      possibleEnemyWDirection[
-        Math.floor(Math.random() * possibleEnemyWDirection.length)
-      ];
+    // Select first random movement
+    if (SHOULD_MOVE) {
+      ref.current.enemyWDirection =
+        possibleEnemyWDirection[
+          Math.floor(Math.random() * possibleEnemyWDirection.length)
+        ];
+    }
   }, []);
 
   console.log("Enemy rendering...");
