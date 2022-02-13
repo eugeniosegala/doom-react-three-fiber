@@ -10,10 +10,17 @@ import limitNumberWithinRange from "../utils/limitNumberWithinRange";
 import calcLine from "../utils/calcLine";
 
 const ENEMY_SPEED = 0.025;
-
-const direction = new Vector3();
+const ENEMY_CHASE_SPEED = 0.0075;
+const ENEMY_BULLET_SPEED = 0.05;
+const ENEMY_ATTACK_INTERVAL = 1000;
+const ENEMY_AGGRO_AREA = 15;
+const WORLD_COLLISION_MARGIN = 2;
+const TOP_LEFT_BOUNDARY = -9999;
+const BOTTOM_RIGHT_BOUNDARY = 9999;
 
 const possibleEnemyWDirection = ["up", "down", "right", "left"];
+
+const direction = new Vector3();
 
 // TODO: Consider to use Web Workers
 
@@ -80,7 +87,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
           x: enemyPosition.x,
           y: enemyPosition.y,
           z: enemyPosition.z,
-        }) < 15;
+        }) < ENEMY_AGGRO_AREA;
 
       const playerDirection = direction.subVectors(
         new Vector3(enemyPosition.x, enemyPosition.y, enemyPosition.z),
@@ -96,11 +103,11 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
 
         const playerDirectionBullet = playerDirection
           .clone()
-          .multiplyScalar(0.05);
+          .multiplyScalar(ENEMY_BULLET_SPEED);
 
         const now = Date.now();
         if (now >= (ref.current.timeToShoot || 0)) {
-          ref.current.timeToShoot = now + 1000;
+          ref.current.timeToShoot = now + ENEMY_ATTACK_INTERVAL;
           setBullets(() => [
             {
               id: now,
@@ -133,7 +140,9 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
             obj.name !== `enemy-${position[0]}-${position[2]}`
         ),
       ].filter((e) => {
-        return calcDistance(e.position, enemyPosition) <= 2;
+        return (
+          calcDistance(e.position, enemyPosition) <= WORLD_COLLISION_MARGIN
+        );
       });
 
       const topCollisions = wallsCollisions.filter((e) => {
@@ -148,7 +157,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
         closestObject(
           topCollisions.map((e) => e.position.z),
           enemyPosition.z,
-          -9999
+          TOP_LEFT_BOUNDARY
         ) + 1;
 
       const bottomCollisions = wallsCollisions.filter((e) => {
@@ -163,7 +172,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
         closestObject(
           bottomCollisions.map((e) => e.position.z),
           enemyPosition.z,
-          9999
+          BOTTOM_RIGHT_BOUNDARY
         ) - 1;
 
       const rightCollisions = wallsCollisions.filter((e) => {
@@ -178,7 +187,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
         closestObject(
           rightCollisions.map((e) => e.position.x),
           enemyPosition.x,
-          9999
+          BOTTOM_RIGHT_BOUNDARY
         ) - 1;
 
       const leftCollisions = wallsCollisions.filter((e) => {
@@ -193,7 +202,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
         closestObject(
           leftCollisions.map((e) => e.position.x),
           enemyPosition.x,
-          -9999
+          TOP_LEFT_BOUNDARY
         ) + 1;
 
       ////////////////////////////
@@ -238,7 +247,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
 
         const playerDirectionChase = playerDirection
           .clone()
-          .multiplyScalar(0.0075);
+          .multiplyScalar(ENEMY_CHASE_SPEED);
 
         if (!playerProximityChase) {
           ref?.current?.position.set(
@@ -268,7 +277,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
       currTime = clock.getElapsedTime();
 
       if (currTime - prevTime > 3) {
-        // deciding next movement based on current position
+        // deciding next random movement based on current position
         if (leftCollisions.length) {
           ref.current.enemyWDirection = [
             "up",
