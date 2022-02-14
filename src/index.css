@@ -34,25 +34,39 @@ body {
 }
 
 .gun {
-    height: 500px;
-    width: 300px;
+    height: 550px;
+    width: 400px;
     margin: auto;
     bottom: 0;
     left: 0;
     right: 0;
     position: absolute;
-    background-image: url('./images/gun.png');
+    background-image: url('./images/gun-idle.png');
     background-size: cover;
+    image-rendering: optimizeSpeed;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -o-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: pixelated;
+    image-rendering: optimize-contrast;
+    -ms-interpolation-mode: nearest-neighbor;
 }
 
 .gun-fire {
-    height: 500px;
-    width: 300px;
+    height: 550px;
+    width: 400px;
     margin: auto;
     bottom: 0;
     left: 0;
     right: 0;
     position: absolute;
-    background-image: url('./images/gun-fire.png');
+    background-image: url('./images/gun-shoot.gif');
     background-size: cover;
+    image-rendering: optimizeSpeed;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -o-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: pixelated;
+    image-rendering: optimize-contrast;
+    -ms-interpolation-mode: nearest-neighbor;
 }

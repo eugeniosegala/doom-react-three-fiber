@@ -218,9 +218,10 @@ const Player = () => {
           if (now >= (player.current.timeToShoot || 0)) {
             player.current.timeToShoot = now + 650;
             shoot(true);
+            // Time for animation to finish
             setTimeout(() => {
               shoot(false);
-            }, 150);
+            }, 350);
             setBullets((bullets) => [
               // ...bullets,
               {
