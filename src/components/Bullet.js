@@ -47,7 +47,7 @@ const Bullet = ({ position, velocity, name, setBullets, collisionMarker }) => {
 
   return (
     <mesh ref={ref} position={position} name={name}>
-      <sphereBufferGeometry args={[0.1, 32, 32]} />
+      <sphereBufferGeometry args={[0.05, 32, 32]} />
     </mesh>
   );
 };

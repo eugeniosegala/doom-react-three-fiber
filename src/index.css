@@ -12,7 +12,6 @@ body,
     background-color: black;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
-    -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
@@ -33,40 +32,27 @@ body {
     top: unset !important;
 }
 
-.gun {
-    height: 550px;
-    width: 400px;
-    margin: auto;
+.weapon-wrapper {
+    width: 100%;
+    position: fixed;
     bottom: 0;
-    left: 0;
-    right: 0;
-    position: absolute;
-    background-image: url('./images/gun-idle.png');
+    height: 525px;
+    display: flex;
+    justify-content: center;
+}
+
+.gun {
+    width: 360px;
+    height: 100%;
     background-size: cover;
-    image-rendering: optimizeSpeed;
-    image-rendering: -moz-crisp-edges;
-    image-rendering: -o-crisp-edges;
-    image-rendering: -webkit-optimize-contrast;
+    margin-right: -50px;
     image-rendering: pixelated;
-    image-rendering: optimize-contrast;
-    -ms-interpolation-mode: nearest-neighbor;
+}
+
+.gun-idle {
+    background-image: url('./images/gun-idle.png');
 }
 
 .gun-fire {
-    height: 550px;
-    width: 400px;
-    margin: auto;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    position: absolute;
     background-image: url('./images/gun-shoot.gif');
-    background-size: cover;
-    image-rendering: optimizeSpeed;
-    image-rendering: -moz-crisp-edges;
-    image-rendering: -o-crisp-edges;
-    image-rendering: -webkit-optimize-contrast;
-    image-rendering: pixelated;
-    image-rendering: optimize-contrast;
-    -ms-interpolation-mode: nearest-neighbor;
 }

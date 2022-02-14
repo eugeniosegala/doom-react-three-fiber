@@ -56,7 +56,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
 
       const bulletCollisions = scene.children.filter((e) => {
         return (
-          calcDistance(e.position, enemyPosition) <= 1 && e.name === "bullet"
+          calcDistance(e.position, enemyPosition) <= 0.8 && e.name === "bullet"
         );
       });
 
