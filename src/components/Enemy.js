@@ -18,6 +18,7 @@ const WORLD_COLLISION_MARGIN = 2;
 const TOP_LEFT_BOUNDARY = -9999;
 const BOTTOM_RIGHT_BOUNDARY = 9999;
 const SHOULD_MOVE = true;
+const POSITION_Y = 0.5;
 
 const possibleEnemyWDirection = ["up", "down", "right", "left"];
 
@@ -234,7 +235,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
                 leftClosest,
                 rightClosest
               ),
-              0.75,
+              POSITION_Y,
               limitNumberWithinRange(
                 (playerDirectionChase.z < 0
                   ? Math.abs(playerDirectionChase.z)
@@ -341,7 +342,6 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
         position={position}
         geometry={dogGeometry}
         material={dogMaterial}
-        scale={1.5}
         name={`enemy-${position[0]}-${position[2]}`}
       />
       {bullets.map((bullet) => {

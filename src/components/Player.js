@@ -15,6 +15,7 @@ const PLAYER_BULLET_SPEED = 1;
 const WORLD_COLLISION_MARGIN = 1.45;
 const TOP_LEFT_BOUNDARY = -9999;
 const BOTTOM_RIGHT_BOUNDARY = 9999;
+const POSITION_Y = 1;
 
 const cameraDirection = new Vector3();
 const playerDirection = new Vector3();
@@ -180,7 +181,7 @@ const Player = () => {
           .multiplyScalar(PLAYER_SPEED)
           .applyEuler(camera.rotation);
 
-        camera?.position.set(position.x, 1, position.z);
+        camera?.position.set(position.x, POSITION_Y, position.z);
 
         ////////////////////////////
         ///// Player object position manager
@@ -192,7 +193,7 @@ const Player = () => {
             angleTopLeftLimit || angleBottomLeftLimit || leftClosest,
             angleTopRightLimit || angleBottomRightLimit || rightClosest
           ),
-          0.5,
+          POSITION_Y,
           limitNumberWithinRange(
             playerDirection.z + position.z,
             topClosest,

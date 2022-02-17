@@ -38,7 +38,7 @@ const resolveMapTile = (type, x, y, mapData, setCurrentMap) => {
       return (
         <Enemy
           key={key}
-          position={[x, 0.75, y]}
+          position={[x, 0.5, y]}
           type={type}
           mapData={mapData}
           setCurrentMap={setCurrentMap}
