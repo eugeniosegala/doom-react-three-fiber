@@ -54,14 +54,17 @@ const Player = () => {
         ///// Player collisions
         ////////////////////////////
 
-        const wallsCollisions = scene.children[0].children.filter((e) => {
+        const wallsCollisions = [
+          ...scene.children[0].children,
+          ...scene.children.filter((obj) => obj.name.includes("enemy")),
+        ].filter((e) => {
           return calcDistance(e.position, position) <= WORLD_COLLISION_MARGIN;
         });
 
         const topCollisions = wallsCollisions.filter((e) => {
           return (
-            (e.position.x === Math.ceil(position.x) ||
-              e.position.x === Math.floor(position.x)) &&
+            (Math.ceil(e.position.x) === Math.ceil(position.x) ||
+              Math.floor(e.position.x) === Math.floor(position.x)) &&
             e.position.z <= position.z
           );
         });
@@ -75,8 +78,8 @@ const Player = () => {
 
         const bottomCollisions = wallsCollisions.filter((e) => {
           return (
-            (e.position.x === Math.ceil(position.x) ||
-              e.position.x === Math.floor(position.x)) &&
+            (Math.ceil(e.position.x) === Math.ceil(position.x) ||
+              Math.floor(e.position.x) === Math.floor(position.x)) &&
             e.position.z >= position.z
           );
         });
@@ -90,8 +93,8 @@ const Player = () => {
 
         const rightCollisions = wallsCollisions.filter((e) => {
           return (
-            (e.position.z === Math.ceil(position.z) ||
-              e.position.z === Math.floor(position.z)) &&
+            (Math.ceil(e.position.z) === Math.ceil(position.z) ||
+              Math.floor(e.position.z) === Math.floor(position.z)) &&
             e.position.x >= position.x
           );
         });
@@ -105,8 +108,8 @@ const Player = () => {
 
         const leftCollisions = wallsCollisions.filter((e) => {
           return (
-            (e.position.z === Math.ceil(position.z) ||
-              e.position.z === Math.floor(position.z)) &&
+            (Math.ceil(e.position.z) === Math.ceil(position.z) ||
+              Math.floor(e.position.z) === Math.floor(position.z)) &&
             e.position.x <= position.x
           );
         });

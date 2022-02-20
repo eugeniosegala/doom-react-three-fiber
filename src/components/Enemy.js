@@ -18,7 +18,7 @@ const WORLD_COLLISION_MARGIN = 2;
 const TOP_LEFT_BOUNDARY = -9999;
 const BOTTOM_RIGHT_BOUNDARY = 9999;
 const SHOULD_MOVE = true;
-const POSITION_Y = 0.5;
+const POSITION_Y = 0.75;
 
 const possibleEnemyWDirection = ["up", "down", "right", "left"];
 
@@ -47,7 +47,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
 
       ref.current.lookAt(
         camera.position.x,
-        camera.position.y - 0.5,
+        camera.position.y - 0.25,
         camera.position.z
       );
 
@@ -226,6 +226,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
             .clone()
             .multiplyScalar(ENEMY_CHASE_SPEED);
 
+          // Stop moving when too close to player
           if (!playerProximityChase) {
             ref?.current?.position.set(
               limitNumberWithinRange(
