@@ -1,34 +1,63 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import throttle from "lodash-es/throttle";
 import { Vector3 } from "three";
 
 import { dogGeometry, dogMaterial } from "../shared-geometries/dog";
 import Bullet from "./Bullet";
-import { calcDistance } from "../utils/calcDistance";
+import { calcDistance, closestObject } from "../utils/calcDistance";
+import limitNumberWithinRange from "../utils/limitNumberWithinRange";
+import calcLine from "../utils/calcLine";
+
+const ENEMY_SPEED = 0.025;
+const ENEMY_CHASE_SPEED = 0.0075;
+const ENEMY_BULLET_SPEED = 0.05;
+const ENEMY_ATTACK_INTERVAL = 1000;
+const ENEMY_AGGRO_AREA = 15;
+const WORLD_COLLISION_MARGIN = 2;
+const TOP_LEFT_BOUNDARY = -9999;
+const BOTTOM_RIGHT_BOUNDARY = 9999;
+const SHOULD_MOVE = true;
+const POSITION_Y = 0.75;
+
+const possibleEnemyWDirection = ["up", "down", "right", "left"];
 
 const direction = new Vector3();
 
+// TODO: Consider to use Web Workers
+// TODO: Split logic into smaller files
+
 const Enemy = ({ position, mapData, setCurrentMap }) => {
   const [bullets, setBullets] = useState([]);
+
+  let currTime = 0;
+  let prevTime = 0;
 
   const ref = useRef();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const enemyControl = useCallback(
-    throttle(async (scene, camera) => {
-      const dynamicPosition = ref.current?.position;
+    throttle(async (scene, camera, clock) => {
+      const enemyPosition = ref.current?.position;
+      const playerPosition = scene.children[1].position;
 
-      const playerProximity =
-        calcDistance(scene.children[1].position, {
-          x: dynamicPosition.x,
-          y: dynamicPosition.y,
-          z: dynamicPosition.z,
-        }) < 10;
+      ////////////////////////////
+      ///// Camera manager
+      ////////////////////////////
+
+      ref.current.lookAt(
+        camera.position.x,
+        camera.position.y - 0.25,
+        camera.position.z
+      );
+
+      ////////////////////////////
+      ///// Bullet behaviour
+      ////////////////////////////
 
       const bulletCollisions = scene.children.filter((e) => {
         return (
-          calcDistance(e.position, dynamicPosition) <= 1 && e.name === "bullet"
+          calcDistance(e.position, enemyPosition) <= 0.8 && e.name === "bullet"
         );
       });
 
@@ -38,54 +67,272 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
         setCurrentMap(newMapData);
       }
 
-      ref.current.lookAt(
-        camera.position.x,
-        camera.position.y - 0.5,
-        camera.position.z
+      ////////////////////////////
+      ///// Reacting to Player
+      ////////////////////////////
+
+      const pointsBetweenEandP = calcLine(
+        Math.floor(playerPosition.x),
+        Math.floor(playerPosition.z),
+        Math.floor(enemyPosition.x),
+        Math.floor(enemyPosition.z)
       );
 
-      if (playerProximity) {
-        const player = direction
-          .subVectors(
-            new Vector3(
-              dynamicPosition.x,
-              dynamicPosition.y,
-              dynamicPosition.z
-            ),
-            new Vector3(
-              scene.children[1].position.x,
-              scene.children[1].position.y,
-              scene.children[1].position.z
-            )
-          )
+      const objectsBetweenEandP = scene.children[0].children.find((obj) =>
+        pointsBetweenEandP.find(
+          (possibleObj) =>
+            possibleObj.x === obj.position.x && possibleObj.z === obj.position.z
+        )
+      );
+
+      const playerProximityAggro =
+        calcDistance(playerPosition, {
+          x: enemyPosition.x,
+          y: enemyPosition.y,
+          z: enemyPosition.z,
+        }) < ENEMY_AGGRO_AREA;
+
+      const playerDirection = direction.subVectors(
+        new Vector3(enemyPosition.x, enemyPosition.y, enemyPosition.z),
+        new Vector3(
+          scene.children[1].position.x,
+          scene.children[1].position.y,
+          scene.children[1].position.z
+        )
+      );
+
+      if (playerProximityAggro && !objectsBetweenEandP) {
+        ref.current.isChaising = true;
+
+        const playerDirectionBullet = playerDirection
           .clone()
-          .multiplyScalar(0.1);
+          .multiplyScalar(ENEMY_BULLET_SPEED);
 
         const now = Date.now();
         if (now >= (ref.current.timeToShoot || 0)) {
-          ref.current.timeToShoot = now + 1000;
+          ref.current.timeToShoot = now + ENEMY_ATTACK_INTERVAL;
           setBullets(() => [
             {
               id: now,
-              position: [
-                dynamicPosition.x,
-                dynamicPosition.y,
-                dynamicPosition.z,
-              ],
+              position: [enemyPosition.x, enemyPosition.y, enemyPosition.z],
               forward: [
-                player.x < 0 ? Math.abs(player.x) : -Math.abs(player.x),
-                player.y < 0 ? Math.abs(player.y) : -Math.abs(player.y),
-                player.z < 0 ? Math.abs(player.z) : -Math.abs(player.z),
+                playerDirectionBullet.x < 0
+                  ? Math.abs(playerDirectionBullet.x)
+                  : -Math.abs(playerDirectionBullet.x),
+                playerDirectionBullet.y < 0
+                  ? Math.abs(playerDirectionBullet.y)
+                  : -Math.abs(playerDirectionBullet.y),
+                playerDirectionBullet.z < 0
+                  ? Math.abs(playerDirectionBullet.z)
+                  : -Math.abs(playerDirectionBullet.z),
               ],
             },
           ]);
         }
       }
-    }, 5),
+
+      ////////////////////////////
+      ///// Enemy collisions
+      ////////////////////////////
+
+      const wallsCollisions = [
+        ...scene.children[0].children,
+        ...scene.children.filter(
+          (obj) =>
+            obj.name.includes("enemy") &&
+            obj.name !== `enemy-${position[0]}-${position[2]}`
+        ),
+      ].filter((e) => {
+        return (
+          calcDistance(e.position, enemyPosition) <= WORLD_COLLISION_MARGIN
+        );
+      });
+
+      const topCollisions = wallsCollisions.filter((e) => {
+        return (
+          (Math.ceil(e.position.x) === Math.ceil(enemyPosition.x) ||
+            Math.floor(e.position.x) === Math.floor(enemyPosition.x)) &&
+          e.position.z <= enemyPosition.z
+        );
+      });
+
+      const topClosest =
+        closestObject(
+          topCollisions.map((e) => e.position.z),
+          enemyPosition.z,
+          TOP_LEFT_BOUNDARY
+        ) + 1;
+
+      const bottomCollisions = wallsCollisions.filter((e) => {
+        return (
+          (Math.ceil(e.position.x) === Math.ceil(enemyPosition.x) ||
+            Math.floor(e.position.x) === Math.floor(enemyPosition.x)) &&
+          e.position.z >= enemyPosition.z
+        );
+      });
+
+      const bottomClosest =
+        closestObject(
+          bottomCollisions.map((e) => e.position.z),
+          enemyPosition.z,
+          BOTTOM_RIGHT_BOUNDARY
+        ) - 1;
+
+      const rightCollisions = wallsCollisions.filter((e) => {
+        return (
+          (Math.ceil(e.position.z) === Math.ceil(enemyPosition.z) ||
+            Math.floor(e.position.z) === Math.floor(enemyPosition.z)) &&
+          e.position.x >= enemyPosition.x
+        );
+      });
+
+      const rightClosest =
+        closestObject(
+          rightCollisions.map((e) => e.position.x),
+          enemyPosition.x,
+          BOTTOM_RIGHT_BOUNDARY
+        ) - 1;
+
+      const leftCollisions = wallsCollisions.filter((e) => {
+        return (
+          (Math.ceil(e.position.z) === Math.ceil(enemyPosition.z) ||
+            Math.floor(e.position.z) === Math.floor(enemyPosition.z)) &&
+          e.position.x <= enemyPosition.x
+        );
+      });
+
+      const leftClosest =
+        closestObject(
+          leftCollisions.map((e) => e.position.x),
+          enemyPosition.x,
+          TOP_LEFT_BOUNDARY
+        ) + 1;
+
+      ////////////////////////////
+      ///// Enemy movements
+      ////////////////////////////
+
+      if (SHOULD_MOVE) {
+        // Chase mode
+        if (ref.current.isChaising) {
+          const playerProximityChase =
+            calcDistance(playerPosition, {
+              x: enemyPosition.x,
+              y: enemyPosition.y,
+              z: enemyPosition.z,
+            }) < 2;
+
+          const playerDirectionChase = playerDirection
+            .clone()
+            .multiplyScalar(ENEMY_CHASE_SPEED);
+
+          // Stop moving when too close to player
+          if (!playerProximityChase) {
+            ref?.current?.position.set(
+              limitNumberWithinRange(
+                (playerDirectionChase.x < 0
+                  ? Math.abs(playerDirectionChase.x)
+                  : -Math.abs(playerDirectionChase.x)) + enemyPosition?.x,
+                leftClosest,
+                rightClosest
+              ),
+              POSITION_Y,
+              limitNumberWithinRange(
+                (playerDirectionChase.z < 0
+                  ? Math.abs(playerDirectionChase.z)
+                  : -Math.abs(playerDirectionChase.z)) + enemyPosition?.z,
+                topClosest,
+                bottomClosest
+              )
+            );
+          }
+        }
+
+        // Pre-script movements
+        if (!ref.current.isChaising) {
+          if (enemyPosition.z > topClosest) {
+            if (ref.current.enemyWDirection === "up") {
+              enemyPosition.z = (enemyPosition.z * 10 - ENEMY_SPEED * 10) / 10;
+            }
+          }
+
+          if (enemyPosition.z < bottomClosest) {
+            if (ref.current.enemyWDirection === "down") {
+              enemyPosition.z = (enemyPosition.z * 10 + ENEMY_SPEED * 10) / 10;
+            }
+          }
+
+          if (enemyPosition.x < rightClosest) {
+            if (ref.current.enemyWDirection === "right") {
+              enemyPosition.x = (enemyPosition.x * 10 + ENEMY_SPEED * 10) / 10;
+            }
+          }
+
+          if (enemyPosition.x > leftClosest) {
+            if (ref.current.enemyWDirection === "left") {
+              enemyPosition.x = (enemyPosition.x * 10 - ENEMY_SPEED * 10) / 10;
+            }
+          }
+
+          // Random movements based of timers
+          currTime = clock.getElapsedTime();
+
+          if (currTime - prevTime > 3) {
+            // deciding next random movement based on current position
+            if (leftCollisions.length) {
+              ref.current.enemyWDirection = [
+                "up",
+                "down",
+                "right",
+                "right",
+                "right",
+              ][Math.floor(Math.random() * possibleEnemyWDirection.length)];
+            } else if (rightCollisions.length) {
+              ref.current.enemyWDirection = [
+                "up",
+                "down",
+                "left",
+                "left",
+                "left",
+              ][Math.floor(Math.random() * possibleEnemyWDirection.length)];
+            } else if (topCollisions.length) {
+              ref.current.enemyWDirection = [
+                "left",
+                "right",
+                "down",
+                "down",
+                "down",
+              ][Math.floor(Math.random() * possibleEnemyWDirection.length)];
+            } else if (bottomCollisions.length) {
+              ref.current.enemyWDirection = ["left", "right", "up", "up", "up"][
+                Math.floor(Math.random() * possibleEnemyWDirection.length)
+              ];
+            } else {
+              ref.current.enemyWDirection =
+                possibleEnemyWDirection[
+                  Math.floor(Math.random() * possibleEnemyWDirection.length)
+                ];
+            }
+
+            prevTime = clock.getElapsedTime();
+          }
+        }
+      }
+    }, 10),
     []
   );
 
-  useFrame(({ scene, camera }) => enemyControl(scene, camera));
+  useFrame(({ scene, camera, clock }) => enemyControl(scene, camera, clock));
+
+  useEffect(() => {
+    // Select first random movement
+    if (SHOULD_MOVE) {
+      ref.current.enemyWDirection =
+        possibleEnemyWDirection[
+          Math.floor(Math.random() * possibleEnemyWDirection.length)
+        ];
+    }
+  }, []);
 
   console.log("Enemy rendering...");
 
@@ -96,8 +343,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
         position={position}
         geometry={dogGeometry}
         material={dogMaterial}
-        scale={1.5}
-        name="enemy"
+        name={`enemy-${position[0]}-${position[2]}`}
       />
       {bullets.map((bullet) => {
         return (
@@ -106,7 +352,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
             position={bullet.position}
             velocity={bullet.forward}
             setBullets={setBullets}
-            collisionMarker={["player"]}
+            collisionMarker={["player", "wall"]}
           />
         );
       })}

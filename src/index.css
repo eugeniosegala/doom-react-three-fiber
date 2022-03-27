@@ -12,7 +12,6 @@ body,
     background-color: black;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
-    -khtml-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
@@ -33,81 +32,27 @@ body {
     top: unset !important;
 }
 
-.d-pad {
+.weapon-wrapper {
+    width: 100%;
     position: fixed;
-    right: 10px;
-    bottom: 10px;
-    width: 90px;
-    height: 90px;
-    z-index: 2;
-}
-
-.d-pad button {
-    position: absolute;
-    background: #404040;
-    border: none;
-    width: 30px;
-    height: 30px;
-}
-
-#up {
-    top: 0;
-    left: calc(50% - 15px);
-    border: solid black 2px;
-    border-bottom: none;
-    border-radius: 8px 8px 0 0;
-}
-
-#right {
-    right: 0;
-    top: calc(50% - 15px);
-    border: solid black 2px;
-    border-left: none;
-    border-radius: 0 8px 8px 0;
-}
-
-#down {
     bottom: 0;
-    left: calc(50% - 15px);
-    border: solid black 2px;
-    border-top: none;
-    border-radius: 0 0 8px 8px;
-}
-
-#left {
-    left: 0;
-    top: calc(50% - 15px);
-    border: solid black 2px;
-    border-right: none;
-    border-radius: 8px 0 0 8px;
-}
-
-#center {
-    left: calc(50% - 15px);
-    top: calc(50% - 15px);
-    background: #000;
+    height: 525px;
+    display: flex;
+    justify-content: center;
 }
 
 .gun {
-    height: 500px;
-    width: 300px;
-    margin: auto;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    position: absolute;
-    background-image: url('./images/gun.png');
+    width: 360px;
+    height: 100%;
     background-size: cover;
+    margin-right: -50px;
+    image-rendering: pixelated;
+}
+
+.gun-idle {
+    background-image: url('./images/gun-idle.png');
 }
 
 .gun-fire {
-    height: 500px;
-    width: 300px;
-    margin: auto;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    position: absolute;
-    background-image: url('./images/gun-fire.png');
-    background-size: cover;
+    background-image: url('./images/gun-shoot.gif');
 }
