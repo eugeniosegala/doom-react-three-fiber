@@ -1,5 +1,5 @@
 import React, { Suspense } from "react";
-import ReactDOM from "react-dom";
+import * as ReactDOM from 'react-dom/client';
 import { Canvas } from "@react-three/fiber";
 import { Loader } from "@react-three/drei";
 

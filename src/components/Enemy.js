@@ -17,8 +17,8 @@ const ENEMY_AGGRO_AREA = 15;
 const WORLD_COLLISION_MARGIN = 2;
 const TOP_LEFT_BOUNDARY = -9999;
 const BOTTOM_RIGHT_BOUNDARY = 9999;
-const SHOULD_MOVE = true;
 const POSITION_Y = 0.75;
+const SHOULD_MOVE = true;
 
 const possibleEnemyWDirection = ["up", "down", "right", "left"];
 
@@ -30,6 +30,7 @@ const direction = new Vector3();
 const Enemy = ({ position, mapData, setCurrentMap }) => {
   const [bullets, setBullets] = useState([]);
 
+  let isAlive = true;
   let currTime = 0;
   let prevTime = 0;
 
@@ -62,9 +63,11 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
       });
 
       if (bulletCollisions.length) {
-        let newMapData = [...mapData];
-        newMapData[position[2]][position[0]] = "·";
-        setCurrentMap(newMapData);
+        isAlive = false
+        // in case you want to remove it from the map
+        // let newMapData = [...mapData];
+        // newMapData[position[2]][position[0]] = "·";
+        // setCurrentMap(newMapData);
       }
 
       ////////////////////////////
@@ -101,7 +104,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
         )
       );
 
-      if (playerProximityAggro && !objectsBetweenEandP) {
+      if (playerProximityAggro && !objectsBetweenEandP && isAlive) {
         ref.current.isChaising = true;
 
         const playerDirectionBullet = playerDirection
@@ -212,7 +215,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
       ///// Enemy movements
       ////////////////////////////
 
-      if (SHOULD_MOVE) {
+      if (SHOULD_MOVE && isAlive) {
         // Chase mode
         if (ref.current.isChaising) {
           const playerProximityChase =

@@ -45,7 +45,7 @@ const Coin = ({ position, mapData, setCurrentMap }) => {
       name="coin"
       rotation={[-Math.PI / 2, 0, 0]}
     >
-      <planeBufferGeometry attach="geometry" />
+      <planeGeometry attach="geometry" />
       <meshStandardMaterial attach="material" transparent={true} map={coin} />
     </mesh>
   );

@@ -21,7 +21,7 @@ const FlatObject = ({ texture, position, name }) => {
 
   return (
     <mesh ref={ref} position={position} name={name}>
-      <planeBufferGeometry attach="geometry" />
+      <planeGeometry attach="geometry" />
       <meshStandardMaterial
         attach="material"
         transparent={true}

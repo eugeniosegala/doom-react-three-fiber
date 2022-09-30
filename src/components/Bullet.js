@@ -6,6 +6,7 @@ import fireSound from "../sounds/fire.mp3";
 
 const Bullet = ({ position, velocity, name, setBullets, collisionMarker }) => {
   const sound = new Audio(fireSound);
+  sound.volume = 0.5;
   const ref = useRef();
 
   useEffect(() => {
@@ -47,7 +48,7 @@ const Bullet = ({ position, velocity, name, setBullets, collisionMarker }) => {
 
   return (
     <mesh ref={ref} position={position} name={name}>
-      <sphereBufferGeometry args={[0.05, 32, 32]} />
+      <sphereGeometry args={[0.05, 32, 32]} />
     </mesh>
   );
 };
