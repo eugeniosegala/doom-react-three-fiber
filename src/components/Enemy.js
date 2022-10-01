@@ -3,7 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import throttle from "lodash-es/throttle";
 import { Vector3 } from "three";
 
-import { dogGeometry, dogMaterial } from "../shared-geometries/dog";
+import { enemyGeometry, enemyMaterial } from "../shared-geometries/enemy";
 import Bullet from "./Bullet";
 import { calcDistance, closestObject } from "../utils/calcDistance";
 import limitNumberWithinRange from "../utils/limitNumberWithinRange";
@@ -344,8 +344,8 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
       <mesh
         ref={ref}
         position={position}
-        geometry={dogGeometry}
-        material={dogMaterial}
+        geometry={enemyGeometry}
+        material={enemyMaterial}
         name={`enemy-${position[0]}-${position[2]}`}
       />
       {bullets.map((bullet) => {

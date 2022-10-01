@@ -11,7 +11,7 @@ import wallImg from "../images/wall.jpg";
 import coinImg from "../images/coin.gif";
 import barrelImg from "../images/barrel.png";
 import orbImg from "../images/orb.gif";
-import dogImg from "../images/dog.png";
+import enemyImg from "../images/enemy.png";
 
 // instantiate GifLoader
 const gifLoader = new GifLoader();
@@ -39,6 +39,6 @@ const wall = imgLoader(wallImg);
 const coin = imgLoader(coinImg, "gif");
 const barrel = imgLoader(barrelImg);
 const orb = imgLoader(orbImg, "gif");
-const dog = imgLoader(dogImg);
+const enemy = imgLoader(enemyImg);
 
-export { wall, coin, barrel, orb, dog };
+export { wall, coin, barrel, orb, enemy };
