@@ -11,13 +11,15 @@ import wallImg from "../images/wall.jpg";
 import coinImg from "../images/coin.gif";
 import barrelImg from "../images/barrel.png";
 import orbImg from "../images/orb.gif";
-import enemyImg from "../images/enemy.png";
+import enemyImg from "../images/enemy.gif";
+import deadEnemyImg from "../images/dead-enemy.gif";
+import deadEnemyStaticImg from "../images/dead-enemy-static.png";
 
 // instantiate GifLoader
 const gifLoader = new GifLoader();
 const pngLoader = new TextureLoader();
 
-function imgLoader(path, type) {
+export function imgLoader(path, type) {
   let image;
 
   if (type === "gif") {
@@ -39,6 +41,7 @@ const wall = imgLoader(wallImg);
 const coin = imgLoader(coinImg, "gif");
 const barrel = imgLoader(barrelImg);
 const orb = imgLoader(orbImg, "gif");
-const enemy = imgLoader(enemyImg);
+const enemy = imgLoader(enemyImg, "gif");
+const deadEnemyStatic = imgLoader(deadEnemyStaticImg);
 
-export { wall, coin, barrel, orb, enemy };
+export { wall, coin, barrel, orb, enemy, deadEnemyStatic };

@@ -1,17 +1,24 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import throttle from "lodash-es/throttle";
-import { Vector3 } from "three";
+import { MeshStandardMaterial, Vector3 } from "three";
 
-import { enemyGeometry, enemyMaterial } from "../shared-geometries/enemy";
+import {
+  deadEnemyStaticMaterial,
+  enemyGeometry,
+  enemyMaterial,
+} from "../shared-geometries/enemy";
 import Bullet from "./Bullet";
 import { calcDistance, closestObject } from "../utils/calcDistance";
 import limitNumberWithinRange from "../utils/limitNumberWithinRange";
 import calcLine from "../utils/calcLine";
+import { imgLoader } from "../utils/textureManager";
+import deadEnemyImg from "../images/dead-enemy.gif";
+import enemyDeathSound from "../sounds/enemy-death.wav";
 
 const ENEMY_SPEED = 0.025;
 const ENEMY_CHASE_SPEED = 0.0075;
-const ENEMY_BULLET_SPEED = 0.05;
+const ENEMY_BULLET_SPEED = 0.075;
 const ENEMY_ATTACK_INTERVAL = 1000;
 const ENEMY_AGGRO_AREA = 15;
 const WORLD_COLLISION_MARGIN = 2;
@@ -29,6 +36,10 @@ const direction = new Vector3();
 
 const Enemy = ({ position, mapData, setCurrentMap }) => {
   const [bullets, setBullets] = useState([]);
+
+  const sound = new Audio(enemyDeathSound);
+
+  const [baseMaterial, setBaseMaterial] = useState(enemyMaterial);
 
   let isAlive = true;
   let currTime = 0;
@@ -62,8 +73,23 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
         );
       });
 
-      if (bulletCollisions.length) {
-        isAlive = false
+      if (bulletCollisions.length && isAlive) {
+        const deadEnemy = imgLoader(deadEnemyImg, "gif");
+
+        const deadEnemyMaterial = new MeshStandardMaterial({
+          map: deadEnemy,
+          transparent: true,
+        });
+
+        isAlive = false;
+
+        sound.play();
+        setBaseMaterial(deadEnemyMaterial);
+
+        setTimeout(function () {
+          setBaseMaterial(deadEnemyStaticMaterial);
+        }, 1000);
+
         // in case you want to remove it from the map
         // let newMapData = [...mapData];
         // newMapData[position[2]][position[0]] = "·";
@@ -345,7 +371,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
         ref={ref}
         position={position}
         geometry={enemyGeometry}
-        material={enemyMaterial}
+        material={baseMaterial}
         name={`enemy-${position[0]}-${position[2]}`}
       />
       {bullets.map((bullet) => {

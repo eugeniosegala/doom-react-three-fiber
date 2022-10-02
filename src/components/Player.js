@@ -11,7 +11,7 @@ import { calcDistance, closestObject } from "../utils/calcDistance";
 import limitNumberWithinRange from "../utils/limitNumberWithinRange";
 
 const PLAYER_SPEED = 0.09;
-const PLAYER_BULLET_SPEED = 1;
+const PLAYER_BULLET_SPEED = 0.8;
 const WORLD_COLLISION_MARGIN = 1.5;
 const TOP_LEFT_BOUNDARY = -9999;
 const BOTTOM_RIGHT_BOUNDARY = 9999;

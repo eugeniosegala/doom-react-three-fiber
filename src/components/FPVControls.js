@@ -6,7 +6,6 @@ import fireSound from "../sounds/music.mp3";
 
 extend({ PointerLockControlsImpl });
 
-// this is temporary
 const sound = new Audio(fireSound);
 
 const FPVControls = () => {
@@ -15,7 +14,7 @@ const FPVControls = () => {
 
   useEffect(() => {
     document.addEventListener("click", () => {
-      // sound.play();
+      sound.play();
       controls.current.lock();
     });
   }, []);
