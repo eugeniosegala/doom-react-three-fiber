@@ -6,13 +6,15 @@ import fireSound from "../sounds/fire.mp3";
 
 const Bullet = ({ position, velocity, name, setBullets, collisionMarker }) => {
   const sound = new Audio(fireSound);
-  sound.volume = 0.5;
   const ref = useRef();
+
+  sound.volume = 0.5;
 
   useEffect(() => {
     sound.play();
   }, []);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const bulletControl = useCallback(
     throttle(async (scene) => {
       const position = ref.current?.position;

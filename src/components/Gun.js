@@ -10,9 +10,9 @@ const Gun = () => {
     <div className="weapon-wrapper">
       <div className="gun">
         {isShooting ? (
-          <img src={gunShoot} height="100%" alt="asd" />
+          <img src={gunShoot} height="100%" alt="gun shoot" />
         ) : (
-          <img src={gunIdle} height="100%" alt="asd" />
+          <img src={gunIdle} height="100%" alt="gun idle" />
         )}
       </div>
     </div>

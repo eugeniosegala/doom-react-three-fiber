@@ -8,7 +8,6 @@ import { calcDistance } from "../utils/calcDistance";
 
 const Coin = ({ position, mapData, setCurrentMap }) => {
   const sound = new Audio(coinSound);
-
   const ref = useRef();
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -17,8 +16,10 @@ const Coin = ({ position, mapData, setCurrentMap }) => {
       ref.current?.lookAt(camera.position);
 
       // this is supposed to be the first object in the scene: the player
+      const player = scene.children[1].position;
+
       const collision =
-        calcDistance(scene.children[1].position, {
+        calcDistance(player, {
           x: position[0],
           y: position[1],
           z: position[2],

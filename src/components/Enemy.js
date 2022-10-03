@@ -73,6 +73,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
         );
       });
 
+      // if hit by a bullet
       if (bulletCollisions.length && isAlive) {
         const deadEnemy = imgLoader(deadEnemyImg, "gif");
 
@@ -86,6 +87,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
         sound.play();
         setBaseMaterial(deadEnemyMaterial);
 
+        // set persistent material after death effect
         setTimeout(function () {
           setBaseMaterial(deadEnemyStaticMaterial);
         }, 1000);
@@ -137,6 +139,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
           .clone()
           .multiplyScalar(ENEMY_BULLET_SPEED);
 
+        // start shooting
         const now = Date.now();
         if (now >= (ref.current.timeToShoot || 0)) {
           ref.current.timeToShoot = now + ENEMY_ATTACK_INTERVAL;
@@ -242,7 +245,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
       ////////////////////////////
 
       if (SHOULD_MOVE && isAlive) {
-        // Chase mode
+        // start following player
         if (ref.current.isChaising) {
           const playerProximityChase =
             calcDistance(playerPosition, {
@@ -277,7 +280,7 @@ const Enemy = ({ position, mapData, setCurrentMap }) => {
           }
         }
 
-        // Pre-script movements
+        // Pre-scripted movements - very basic AI
         if (!ref.current.isChaising) {
           if (enemyPosition.z > topClosest) {
             if (ref.current.enemyWDirection === "up") {

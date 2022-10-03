@@ -12,7 +12,6 @@ import coinImg from "../images/coin.gif";
 import barrelImg from "../images/barrel.png";
 import orbImg from "../images/orb.gif";
 import enemyImg from "../images/enemy.gif";
-import deadEnemyImg from "../images/dead-enemy.gif";
 import deadEnemyStaticImg from "../images/dead-enemy-static.png";
 
 // instantiate GifLoader
