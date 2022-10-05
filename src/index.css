@@ -56,3 +56,27 @@ body {
 .gun-fire {
     background-image: url('./images/gun-shoot.gif');
 }
+
+.home-menu {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-flow: column;
+}
+
+.home-menu__logo {
+    width: 100%;
+    height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url("./images/home-logo.gif");
+    background-size: contain;
+    background-position: center top;
+    background-repeat: no-repeat;
+}
+
+.home-menu__link {
+    text-align: center;
+    margin-top: 200px;
+}

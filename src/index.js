@@ -7,6 +7,7 @@ import Level01 from "./levels/Level01";
 import UI from "./components/UI";
 import ViewFinder from "./components/ViewFinder";
 import Gun from "./components/Gun";
+import Home from "./components/Home";
 
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
@@ -34,7 +35,9 @@ const Game = () => {
                 <Level01 />
               </Canvas>
             </Route>
-            <Route path="/">Hello</Route>
+            <Route path="/">
+              <Home />
+            </Route>
           </Switch>
         </Suspense>
       </Router>
