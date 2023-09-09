@@ -1,5 +1,13 @@
-# react-three-fiber-fps-template
+# doom-react-three-fiber
 
-Simple 3D FPS video game based on Three JS.
+Just a simple Doom clone video game based on React Three fiber.
+
+Demo: https://admiring-davinci-152c0f.netlify.app/
+
+Movements: WASD
+
+Camera: mouse
+
+Shoot: space-bar
 
 Sprites are generated using https://www.piskelapp.com/
