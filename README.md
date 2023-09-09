@@ -8,6 +8,6 @@ Movements: WASD
 
 Camera: mouse
 
-Shoot: space-bar
+Shoot: spacebar
 
 Sprites are generated using https://www.piskelapp.com/
